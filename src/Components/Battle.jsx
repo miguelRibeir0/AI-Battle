@@ -13,19 +13,19 @@ import BattleLoading from './BattleBox(loading).jsx';
 import Button from './Button.jsx';
 
 const Battle = () => {
-  const { data: modelA, isLoadingA } = useQuery({
+  const { data: modelA, isLoading: isLoadingA } = useQuery({
     queryKey: ['modelA'],
     queryFn: metaChat,
   });
-  const { data: modelB, isLoadingB } = useQuery({
+  const { data: modelB, isLoading: isLoadingB } = useQuery({
     queryKey: ['modelB'],
     queryFn: mistralChat,
   });
-  const { data: modelC, isLoadingC } = useQuery({
+  const { data: modelC, isLoading: isLoadingC } = useQuery({
     queryKey: ['modelC'],
     queryFn: googleChat,
   });
-  const { data: modelD, isLoadingD } = useQuery({
+  const { data: modelD, isLoading: isLoadingD } = useQuery({
     queryKey: ['modelD'],
     queryFn: metaChat2,
   });
@@ -62,7 +62,7 @@ const Battle = () => {
       boxB: <BattleBox model={model2} id={model2} />,
     });
   };
-
+  console.log(isLoadingA, isLoadingB, isLoadingC, isLoadingD);
   if (isLoadingA || isLoadingB || isLoadingC || isLoadingD) {
     return <BattleLoading />;
   }
