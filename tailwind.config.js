@@ -13,6 +13,9 @@ export default {
       animation: {
         fadeIn: 'fadeIn 2s ease-in-out',
       },
+      fontFamily: {
+        'roboto-mono': ['Roboto Mono', 'monospace'],
+      },
     },
   },
   plugins: [scrollbar, 'prettier-plugin-tailwindcss'],
