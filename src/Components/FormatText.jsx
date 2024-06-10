@@ -16,6 +16,8 @@ const formatText = (text) => {
             );
             // Remove any remaining ** characters
             formattedItem = formattedItem.replace(/\*\*/g, '');
+            // Replace all '*' with ' ' (space)
+            formattedItem = formattedItem.replace(/\*/g, ' ');
             return (
               <li
                 key={idx}
@@ -47,6 +49,8 @@ const formatText = (text) => {
       );
       // Remove any remaining ** characters
       formattedParagraph = formattedParagraph.replace(/\*\*/g, '');
+      // Replace all '*' with ' ' (space)
+      formattedParagraph = formattedParagraph.replace(/\*/g, ' ');
       // Handle regular paragraphs
       return (
         <p
