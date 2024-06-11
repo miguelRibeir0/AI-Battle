@@ -12,7 +12,7 @@ const BattleLoading = () => {
           <BattleModel model="MODEL A" />
           <LoadingAnimation />
         </div>
-        <div className="relative ml-5 h-96 w-5/12 rounded-lg border-2 border-lime-500 p-6">
+        <div className="relative ml-10 h-96 w-5/12 rounded-lg border-2 border-lime-500 p-6">
           <BattleModel model="MODEL B" />
           <LoadingAnimation />
         </div>

@@ -1,4 +1,4 @@
-import Battle from './Components/Battle.jsx';
+import Battle from './Battle.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient({
@@ -14,8 +14,8 @@ function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <section className="w-full h-16 flex items-center ml-20 text-4xl">
-          <h1 className="text-white text-2xl">AI BATTLE ⚔️</h1>
+        <section className="ml-20 flex h-16 w-full items-center text-4xl">
+          <h1 className="text-2xl text-white">AI BATTLE ⚔️</h1>
         </section>
         <Battle></Battle>
       </QueryClientProvider>
