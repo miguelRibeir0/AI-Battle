@@ -30,21 +30,6 @@ const Battle = () => {
   //keeping track of battles
   let [finalCount, setFinalCount] = useState(0);
 
-  if (count === 3) {
-    let newFighter = model.splice(randomIndex, 1)[0];
-
-    //making sure the same model is not selected again
-    while (previousFighter.includes(newFighter)) {
-      randomIndex = Math.floor(Math.random() * model.length);
-      newFighter = model.splice(randomIndex, 1)[0];
-    }
-    model.push(fighter);
-    previousFighter.push(fighter);
-    fighter = newFighter;
-    setCount(0);
-    setFinalCount((prevCount) => prevCount + 1);
-  }
-
   //a way to update fetch requests
   const [queryKeyA, setQueryKeyA] = useState([
     'modelA',
@@ -104,17 +89,29 @@ const Battle = () => {
     setCount((prevCount) => prevCount + 1);
   };
 
-  if (isLoadingA || isLoadingB) {
-    return <BattleLoading />;
-  }
   if (finalCount === 4) {
     return <h1 className="text-white">Game Over</h1>;
   }
 
-  console.log(previousFighter);
-  console.log(queryKeyA[1], queryKeyA[2]);
-  console.log(queryKeyB[1], queryKeyB[2]);
-  console.log(count);
+  if (isLoadingA || isLoadingB) {
+    return <BattleLoading />;
+  }
+
+  if (count === 3) {
+    let newFighter = model.splice(randomIndex, 1)[0];
+
+    //making sure the same model is not selected again
+    while (previousFighter.includes(newFighter)) {
+      randomIndex = Math.floor(Math.random() * model.length);
+      newFighter = model.splice(randomIndex, 1)[0];
+    }
+    model.push(fighter);
+    previousFighter.push(fighter);
+    fighter = newFighter;
+    setCount(0);
+    setFinalCount((prevCount) => prevCount + 1);
+  }
+
   return (
     <>
       {content.prompt}
