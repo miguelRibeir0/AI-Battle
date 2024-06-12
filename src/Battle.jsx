@@ -6,19 +6,8 @@ import BattleBox from './Components/BattleBox.jsx';
 import { useQuery } from '@tanstack/react-query';
 import BattleLoading from './Components/BattleBox(loading).jsx';
 import Button from './Components/Button.jsx';
+import { prompt, model } from './prompt-model.js';
 
-const prompt = [
-  'Explain the importance of language models',
-  'Why is the sky blue?',
-  'What is the meaning of life?',
-  'What is the best programming language?',
-];
-const model = [
-  'llama3-8b-8192',
-  'mixtral-8x7b-32768',
-  'mixtral-8x7b-32768',
-  'llama3-70b-8192',
-];
 // Randomly select a model to be the fighter
 let randomIndex = Math.floor(Math.random() * model.length);
 let fighter = model.splice(randomIndex, 1)[0];
@@ -89,6 +78,21 @@ const Battle = () => {
     setCount((prevCount) => prevCount + 1);
   };
 
+  //alerting lose of progress on page reload
+  useEffect(() => {
+    const handleUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, []);
+
+  //end-game
   if (finalCount === 4) {
     return <h1 className="text-white">Game Over</h1>;
   }
@@ -96,7 +100,7 @@ const Battle = () => {
   if (isLoadingA || isLoadingB) {
     return <BattleLoading />;
   }
-
+  //choosing a new model
   if (count === 3) {
     let newFighter = model.splice(randomIndex, 1)[0];
 
@@ -112,24 +116,31 @@ const Battle = () => {
     setFinalCount((prevCount) => prevCount + 1);
   }
 
+  console.log(fighter, model[count]);
+
   return (
     <>
       {content.prompt}
-      <section className="mt-10 flex h-screen w-screen items-start justify-center pb-28">
-        <div className="h-96 w-5/12">
-          <div className="relative h-96 w-full rounded-lg border-2 border-lime-500 p-6">
-            <BattleModel model={fighter} />
-            {content.boxA}
+      <section className="mt-10 pb-28">
+        <section className="flex w-screen items-start justify-center">
+          <div className="h-96 w-5/12">
+            <div className="relative h-96 w-full rounded-lg border-2 border-lime-500 p-6">
+              <BattleModel model="MODEL A" />
+              {content.boxA}
+            </div>
           </div>
-          <Button text={'I prefer Model A'} onClick={battleChange} />
-        </div>
-        <div className="ml-10 h-96 w-5/12">
-          <div className="relative h-96 w-full rounded-lg border-2 border-lime-500 p-6">
-            <BattleModel model={model[count]} />
-            {content.boxB}
+          <div className="ml-10 h-96 w-5/12">
+            <div className="relative h-96 w-full rounded-lg border-2 border-lime-500 p-6">
+              <BattleModel model="MODEL B" />
+              {content.boxB}
+            </div>
           </div>
-          <Button text={'I prefer Model B'} onClick={battleChange} />
-        </div>
+        </section>
+        <section className="flex w-full items-start justify-center gap-x-10">
+          <Button text={'I prefer Model A 🤖'} onClick={battleChange} />
+          <Button text={'I prefer Neither ❌'} onClick={battleChange} />
+          <Button text={'I prefer Model B 🤖'} onClick={battleChange} />
+        </section>
       </section>
     </>
   );
