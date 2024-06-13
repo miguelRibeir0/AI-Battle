@@ -1,37 +1,14 @@
+/* eslint-disable */
+import React from 'react';
+
 const formatText = (text) => {
   if (typeof text !== 'string') {
     return [];
   }
+
   const paragraphs = text.split('\n\n').map((paragraph, index) => {
-    // Handle lists
-    if (/^\d+\.\s/.test(paragraph)) {
-      const items = paragraph.split(/\n(?=\d+\.\s)/);
-      return (
-        <ol key={index} className="my-2 list-inside list-decimal">
-          {items.map((item, idx) => {
-            // Replace everything after a bullet point until a colon with bold text
-            let formattedItem = item.replace(
-              /(\d+\.\s)(.*?)(:)/,
-              '$1<strong>$2</strong>$3'
-            );
-            // Remove any remaining ** characters
-            formattedItem = formattedItem.replace(/\*\*/g, '');
-            // Replace all '*' with ' ' (space)
-            formattedItem = formattedItem.replace(/\*/g, ' ');
-            return (
-              <li
-                key={idx}
-                className="mb-2" // Increase the bottom margin
-                dangerouslySetInnerHTML={{
-                  __html: formattedItem.replace(/^\d+\.\s*/, ''),
-                }}
-              ></li>
-            );
-          })}
-        </ol>
-      );
-    } else if (paragraph.startsWith('**')) {
-      // Handle headings
+    // Handle headings
+    if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
       return (
         <h2
           key={index}
@@ -41,28 +18,82 @@ const formatText = (text) => {
           }}
         ></h2>
       );
-    } else {
-      // Replace markdown for bold text with HTML tags
+    }
+    // Handle numbered lists
+    else if (/^\d+\.\s/.test(paragraph)) {
+      const items = paragraph.split(/\n(?=\d+\.\s)/);
+      return (
+        <ol key={index} className="my-2 list-inside list-decimal">
+          {items.map((item, idx) => {
+            let formattedItem = item.replace(
+              /\*\*(.*?)\*\*/g,
+              '<strong>$1</strong>'
+            );
+            return (
+              <li
+                key={idx}
+                className="mb-2"
+                dangerouslySetInnerHTML={{
+                  __html: formattedItem.replace(/^\d+\.\s*/, ''),
+                }}
+              ></li>
+            );
+          })}
+        </ol>
+      );
+    }
+    // Handle bulleted lists with asterisks or hyphens
+    else if (/^(\*\s|-\s)/.test(paragraph)) {
+      const items = paragraph.split(/\n(?=\*\s|-\s)/);
+      return (
+        <ul key={index} className="my-2 list-inside list-disc">
+          {items.map((item, idx) => {
+            let formattedItem = item.replace(/^(\*\s|-\s)/, '');
+            formattedItem = formattedItem.replace(
+              /\*\*(.*?)\*\*/g,
+              '<strong>$1</strong>'
+            );
+            return (
+              <li
+                key={idx}
+                className="mb-2"
+                dangerouslySetInnerHTML={{
+                  __html: formattedItem,
+                }}
+              ></li>
+            );
+          })}
+        </ul>
+      );
+    }
+    // Handle regular paragraphs
+    else {
       let formattedParagraph = paragraph.replace(
         /\*\*(.*?)\*\*/g,
         '<strong>$1</strong>'
       );
-      // Remove any remaining ** characters
-      formattedParagraph = formattedParagraph.replace(/\*\*/g, '');
-      // Replace all '*' with ' ' (space)
-      formattedParagraph = formattedParagraph.replace(/\*/g, ' ');
-      // Handle regular paragraphs
       return (
-        <p
+        <div
           key={index}
           className="my-2"
           dangerouslySetInnerHTML={{ __html: formattedParagraph }}
-        ></p>
+        ></div>
       );
     }
   });
 
-  return paragraphs;
+  // Insert space between topics
+  const spacedParagraphs = [];
+  paragraphs.forEach((para, index) => {
+    spacedParagraphs.push(para);
+    if (index < paragraphs.length - 1) {
+      spacedParagraphs.push(
+        <div key={`space-${index}`} className="my-4"></div>
+      );
+    }
+  });
+
+  return spacedParagraphs;
 };
 
 export default formatText;

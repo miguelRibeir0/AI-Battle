@@ -99,16 +99,19 @@ const Battle = () => {
 
   // Alerting loss of progress on page reload
   useEffect(() => {
-    const handleUnload = (event) => {
-      event.preventDefault();
-      event.returnValue = '';
-    };
+    if (finalCount != 4) {
+      const handleUnload = (event) => {
+        event.preventDefault();
+        event.returnValue = '';
+      };
 
-    window.addEventListener('beforeunload', handleUnload);
+      window.addEventListener('beforeunload', handleUnload);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleUnload);
-    };
+      return () => {
+        window.removeEventListener('beforeunload', handleUnload);
+      };
+    }
+    //eslint-disable-next-line
   }, []);
 
   // End-game
@@ -139,22 +142,22 @@ const Battle = () => {
   return (
     <>
       {content.prompt}
-      <section className="mt-10 pb-28">
-        <section className="flex w-screen items-start justify-center">
-          <div className="h-96 w-5/12">
-            <div className="relative h-96 w-full rounded-lg border-2 border-lime-500 p-6">
+      <section className="mt-10 h-screen pb-28">
+        <section className="flex h-3/4 w-screen items-start justify-center">
+          <div className="h-full w-5/12">
+            <div className="relative h-full w-full rounded-lg border-2 border-lime-500 p-6">
               <BattleModel model="MODEL A" />
               {content.boxA}
             </div>
           </div>
-          <div className="ml-10 h-96 w-5/12">
-            <div className="relative h-96 w-full rounded-lg border-2 border-lime-500 p-6">
+          <div className="ml-10 h-full w-5/12">
+            <div className="relative h-full w-full rounded-lg border-2 border-lime-500 p-6">
               <BattleModel model="MODEL B" />
               {content.boxB}
             </div>
           </div>
         </section>
-        <section className="flex w-full items-start justify-center gap-x-10">
+        <section className="mt-7 flex w-full items-start justify-center gap-x-10">
           <Button
             text={'I prefer Model A 🤖'}
             onClick={() => {
