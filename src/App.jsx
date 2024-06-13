@@ -20,7 +20,7 @@ function App() {
     <>
       <BattleId>
         <QueryClientProvider client={queryClient}>
-          {/* {showPopUp && <PopUp onClose={() => setShowPopUp(false)} />}  */}
+          {showPopUp && <PopUp onClose={() => setShowPopUp(false)} />}
           <section className="ml-20 flex h-16 w-full items-center text-4xl">
             <h1 className="text-2xl text-white">AI BATTLE ⚔️</h1>
           </section>

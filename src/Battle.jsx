@@ -1,5 +1,5 @@
 import { groqChat } from './fetchRequests/groq-fetch.js';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import BattleModel from './Components/BattleModel.jsx';
 import Prompt from './Components/Prompt.jsx';
 import BattleBox from './Components/BattleBox.jsx';
@@ -7,19 +7,24 @@ import { useQuery } from '@tanstack/react-query';
 import BattleLoading from './Components/BattleBox(loading).jsx';
 import Button from './Components/Button.jsx';
 import { prompt, model } from './prompt-model.js';
+import { updateBattle } from './fetchRequests/db-fetch.js';
+import { BattleContext } from './Components/BattleId.jsx';
 
 // Randomly select a model to be the fighter
-let randomIndex = Math.floor(Math.random() * model.length);
-let fighter = model.splice(randomIndex, 1)[0];
+const initialModel = [...model]; // Create a copy of the model array
+let randomIndex = Math.floor(Math.random() * initialModel.length);
+let fighter = initialModel.splice(randomIndex, 1)[0];
 const previousFighter = [];
 
 const Battle = () => {
-  //kepping track of rounds
+  // Keeping track of rounds
   let [count, setCount] = useState(0);
-  //keeping track of battles
+  // Keeping track of battles
   let [finalCount, setFinalCount] = useState(0);
+  // Getting user id
+  const { userId } = useContext(BattleContext);
 
-  //a way to update fetch requests
+  // A way to update fetch requests
   const [queryKeyA, setQueryKeyA] = useState([
     'modelA',
     fighter,
@@ -27,30 +32,44 @@ const Battle = () => {
   ]);
   const [queryKeyB, setQueryKeyB] = useState([
     'modelB',
-    model[count],
+    initialModel[count],
     prompt[count],
   ]);
 
   useEffect(() => {
-    //updating content and fetch requests on count change
+    // Ensure count is within bounds of initialModel array (undefined was giving bad requests)
+    if (count >= initialModel.length) {
+      setCount(initialModel.length - 1);
+      return;
+    }
+
+    // Updating content and fetch requests on count change
     setQueryKeyA(['modelA', fighter, prompt[count]]);
-    setQueryKeyB(['modelB', model[count], prompt[count]]);
+    setQueryKeyB(['modelB', initialModel[count], prompt[count]]);
     setContent({
       prompt: <Prompt prompt={prompt[count]} />,
       boxA: <BattleBox model={null} id={'A'} />,
       boxB: <BattleBox model={null} id={'B'} />,
     });
-  }, [count]);
-  //inital fetch of data
+    //eslint-disable-next-line
+  }, [count, fighter]);
+
+  // Initial fetch of data
   const { data: modelA, isLoading: isLoadingA } = useQuery({
     queryKey: queryKeyA,
-    queryFn: () => groqChat(queryKeyA[1], queryKeyA[2]),
+    queryFn: () => {
+      return groqChat(queryKeyA[1], queryKeyA[2]);
+    },
   });
+
   const { data: modelB, isLoading: isLoadingB } = useQuery({
     queryKey: queryKeyB,
-    queryFn: () => groqChat(queryKeyB[1], queryKeyB[2]),
+    queryFn: () => {
+      return groqChat(queryKeyB[1], queryKeyB[2]);
+    },
   });
-  //inital round
+
+  // Initial round
   const [content, setContent] = useState({
     prompt: <Prompt prompt={prompt[count]} />,
     boxA: <BattleBox model={modelA} id={'A'} />,
@@ -58,7 +77,7 @@ const Battle = () => {
   });
 
   useEffect(() => {
-    //updating content when fetch requests are done
+    // Updating content when fetch requests are done
     if (!isLoadingA) {
       setContent((prevContent) => ({
         ...prevContent,
@@ -74,11 +93,11 @@ const Battle = () => {
   }, [isLoadingA, isLoadingB, modelA, modelB]);
 
   const battleChange = () => {
-    //updating count to change round
+    // Updating count to change round
     setCount((prevCount) => prevCount + 1);
   };
 
-  //alerting lose of progress on page reload
+  // Alerting loss of progress on page reload
   useEffect(() => {
     const handleUnload = (event) => {
       event.preventDefault();
@@ -92,7 +111,7 @@ const Battle = () => {
     };
   }, []);
 
-  //end-game
+  // End-game
   if (finalCount === 4) {
     return <h1 className="text-white">Game Over</h1>;
   }
@@ -100,23 +119,22 @@ const Battle = () => {
   if (isLoadingA || isLoadingB) {
     return <BattleLoading />;
   }
-  //choosing a new model
-  if (count === 3) {
-    let newFighter = model.splice(randomIndex, 1)[0];
 
-    //making sure the same model is not selected again
+  // Choosing a new model
+  if (count === 3) {
+    let newFighter = initialModel.splice(randomIndex, 1)[0];
+
+    // Making sure the same model is not selected again
     while (previousFighter.includes(newFighter)) {
-      randomIndex = Math.floor(Math.random() * model.length);
-      newFighter = model.splice(randomIndex, 1)[0];
+      randomIndex = Math.floor(Math.random() * initialModel.length);
+      newFighter = initialModel.splice(randomIndex, 1)[0];
     }
-    model.push(fighter);
+    initialModel.push(fighter);
     previousFighter.push(fighter);
     fighter = newFighter;
     setCount(0);
     setFinalCount((prevCount) => prevCount + 1);
   }
-
-  console.log(fighter, model[count]);
 
   return (
     <>
@@ -137,9 +155,57 @@ const Battle = () => {
           </div>
         </section>
         <section className="flex w-full items-start justify-center gap-x-10">
-          <Button text={'I prefer Model A 🤖'} onClick={battleChange} />
-          <Button text={'I prefer Neither ❌'} onClick={battleChange} />
-          <Button text={'I prefer Model B 🤖'} onClick={battleChange} />
+          <Button
+            text={'I prefer Model A 🤖'}
+            onClick={() => {
+              battleChange();
+              updateBattle(
+                userId,
+                finalCount,
+                count,
+                fighter,
+                initialModel[count],
+                fighter,
+                prompt[count],
+                modelA,
+                modelB
+              );
+            }}
+          />
+          <Button
+            text={'I prefer Neither ❌'}
+            onClick={() => {
+              battleChange();
+              updateBattle(
+                userId,
+                finalCount,
+                count,
+                fighter,
+                initialModel[count],
+                'Draw',
+                prompt[count],
+                modelA,
+                modelB
+              );
+            }}
+          />
+          <Button
+            text={'I prefer Model B 🤖'}
+            onClick={() => {
+              battleChange();
+              updateBattle(
+                userId,
+                finalCount,
+                count,
+                fighter,
+                initialModel[count],
+                initialModel[count],
+                prompt[count],
+                modelA,
+                modelB
+              );
+            }}
+          />
         </section>
       </section>
     </>

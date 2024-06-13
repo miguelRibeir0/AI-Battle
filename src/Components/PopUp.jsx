@@ -1,4 +1,4 @@
-import startBattle from '../fetchRequests/db-fetch';
+import { startBattle } from '../fetchRequests/db-fetch';
 import { useContext } from 'react';
 import { BattleContext } from './BattleId';
 //eslint-disable-next-line

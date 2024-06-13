@@ -10,4 +10,36 @@ const startBattle = async () => {
   return data;
 };
 
-export default startBattle;
+const updateBattle = async (
+  userId,
+  battleCount,
+  round,
+  modelA,
+  modelB,
+  winner,
+  prompt,
+  a_answer,
+  b_answer
+) => {
+  const ans = await fetch('http://localhost:4242/battles/update', {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      userId,
+      battleCount,
+      round,
+      modelA,
+      modelB,
+      winner,
+      prompt,
+      a_answer,
+      b_answer,
+    }),
+  });
+
+  return ans;
+};
+
+export { startBattle, updateBattle };
