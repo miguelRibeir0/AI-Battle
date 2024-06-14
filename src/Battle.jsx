@@ -146,13 +146,13 @@ const Battle = () => {
         <section className="flex h-3/4 w-screen items-start justify-center">
           <div className="h-full w-5/12">
             <div className="relative h-full w-full rounded-lg border-2 border-lime-500 p-6">
-              <BattleModel model="MODEL A" />
+              <BattleModel model={'Model A'} />
               {content.boxA}
             </div>
           </div>
           <div className="ml-10 h-full w-5/12">
             <div className="relative h-full w-full rounded-lg border-2 border-lime-500 p-6">
-              <BattleModel model="MODEL B" />
+              <BattleModel model={'Model B'} />
               {content.boxB}
             </div>
           </div>
@@ -176,7 +176,7 @@ const Battle = () => {
             }}
           />
           <Button
-            text={'I prefer Neither ❌'}
+            text={'Tie ❌'}
             onClick={() => {
               battleChange();
               updateBattle(
@@ -185,7 +185,7 @@ const Battle = () => {
                 count,
                 fighter,
                 initialModel[count],
-                'Draw',
+                'tie',
                 prompt[count],
                 modelA,
                 modelB

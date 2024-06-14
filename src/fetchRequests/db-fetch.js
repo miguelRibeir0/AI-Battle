@@ -1,5 +1,7 @@
+const server = import.meta.env.VITE_SERVER;
+
 const startBattle = async () => {
-  const ans = await fetch('http://localhost:4242/ai-battles/battles/new', {
+  const ans = await fetch(`${server}/ai-battles/battles/new`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -21,7 +23,7 @@ const updateBattle = async (
   a_answer,
   b_answer
 ) => {
-  const ans = await fetch('http://localhost:4242/ai-battles/battles/update', {
+  const ans = await fetch(`${server}/ai-battles/battles/update`, {
     method: 'PUT',
     headers: {
       'content-type': 'application/json',
