@@ -19,8 +19,10 @@ const previousFighter = [];
 const Battle = () => {
   // Keeping track of rounds
   let [count, setCount] = useState(0);
+  console.log(count);
   // Keeping track of battles
   let [finalCount, setFinalCount] = useState(0);
+  console.log(finalCount);
   // Getting user id
   const { userId } = useContext(BattleContext);
 
@@ -37,36 +39,52 @@ const Battle = () => {
   ]);
 
   useEffect(() => {
-    // Ensure count is within bounds of initialModel array (undefined was giving bad requests)
+    // Ensure count is within bounds of initialModel array
     if (count >= initialModel.length) {
       setCount(initialModel.length - 1);
       return;
     }
 
-    // Updating content and fetch requests on count change
-    setQueryKeyA(['modelA', fighter, prompt[count]]);
-    setQueryKeyB(['modelB', initialModel[count], prompt[count]]);
-    setContent({
-      prompt: <Prompt prompt={prompt[count]} />,
-      boxA: <BattleBox model={null} id={'A'} />,
-      boxB: <BattleBox model={null} id={'B'} />,
-    });
-    //eslint-disable-next-line
-  }, [count, fighter]);
+    // Ensure fighter and initialModel[count] are defined
+    if (fighter && initialModel[count]) {
+      setQueryKeyA(['modelA', fighter, prompt[count]]);
+      setQueryKeyB(['modelB', initialModel[count], prompt[count]]);
+      setContent({
+        prompt: <Prompt prompt={prompt[count]} />,
+        boxA: <BattleBox model={null} id={'A'} />,
+        boxB: <BattleBox model={null} id={'B'} />,
+      });
+    } else {
+      console.error('Model or prompt is undefined:', {
+        fighter,
+        modelB: initialModel[count],
+      });
+    }
+  }, [count]);
 
   // Initial fetch of data
   const { data: modelA, isLoading: isLoadingA } = useQuery({
     queryKey: queryKeyA,
     queryFn: () => {
-      return groqChat(queryKeyA[1], queryKeyA[2]);
+      if (queryKeyA[1] && queryKeyA[2]) {
+        return groqChat(queryKeyA[1], queryKeyA[2]);
+      } else {
+        return Promise.resolve(null);
+      }
     },
+    enabled: !!queryKeyA[1] && !!queryKeyA[2],
   });
 
   const { data: modelB, isLoading: isLoadingB } = useQuery({
     queryKey: queryKeyB,
     queryFn: () => {
-      return groqChat(queryKeyB[1], queryKeyB[2]);
+      if (queryKeyB[1] && queryKeyB[2]) {
+        return groqChat(queryKeyB[1], queryKeyB[2]);
+      } else {
+        return Promise.resolve(null);
+      }
     },
+    enabled: !!queryKeyB[1] && !!queryKeyB[2],
   });
 
   // Initial round
@@ -125,13 +143,13 @@ const Battle = () => {
 
   // Choosing a new model
   if (count === 3) {
-    let newFighter = initialModel.splice(randomIndex, 1)[0];
-
-    // Making sure the same model is not selected again
-    while (previousFighter.includes(newFighter)) {
+    let newFighter;
+    // Randomly select a new model that hasn't been used before
+    do {
       randomIndex = Math.floor(Math.random() * initialModel.length);
       newFighter = initialModel.splice(randomIndex, 1)[0];
-    }
+    } while (previousFighter.includes(newFighter));
+
     initialModel.push(fighter);
     previousFighter.push(fighter);
     fighter = newFighter;
@@ -162,13 +180,14 @@ const Battle = () => {
             text={'I prefer Model A 🤖'}
             onClick={() => {
               battleChange();
+
               updateBattle(
                 userId,
                 finalCount,
                 count,
                 fighter,
                 initialModel[count],
-                fighter,
+                'Model A',
                 prompt[count],
                 modelA,
                 modelB
@@ -179,6 +198,7 @@ const Battle = () => {
             text={'Tie ❌'}
             onClick={() => {
               battleChange();
+
               updateBattle(
                 userId,
                 finalCount,
@@ -202,7 +222,7 @@ const Battle = () => {
                 count,
                 fighter,
                 initialModel[count],
-                initialModel[count],
+                'Model B',
                 prompt[count],
                 modelA,
                 modelB
