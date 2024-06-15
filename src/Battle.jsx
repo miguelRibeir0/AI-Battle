@@ -6,6 +6,7 @@ import BattleBox from './Components/BattleBox.jsx';
 import { useQuery } from '@tanstack/react-query';
 import BattleLoading from './Components/BattleBox(loading).jsx';
 import Button from './Components/Button.jsx';
+import GameOver from './Components/GameOver.jsx';
 import { prompt, model } from './prompt-model.js';
 import { updateBattle } from './fetchRequests/db-fetch.js';
 import { BattleContext } from './Components/BattleId.jsx';
@@ -129,7 +130,7 @@ const Battle = () => {
 
   // Display game over message when finalCount reaches 4
   if (finalCount === 4) {
-    return <h1 className="text-white">Game Over</h1>;
+    return <GameOver />;
   }
 
   // Display loading indicator while fetching data
