@@ -170,6 +170,21 @@ const Battle = () => {
     }
   }, [finalCount]);
 
+  const buttonAction = (winner) => {
+    battleChange(); // Increment round count
+    updateBattle(
+      userId,
+      finalCount,
+      count,
+      fighter,
+      initialModel[count],
+      winner,
+      prompt[count],
+      modelA,
+      modelB
+    );
+  };
+
   // Display game over message when finalCount reaches 4
   if (finalCount === 4) {
     return <GameOver />;
@@ -191,57 +206,12 @@ const Battle = () => {
         <section className="mt-5 flex w-full items-start justify-center gap-x-10">
           <Button
             text={'I prefer Model A 🤖'}
-            onClick={() => {
-              battleChange(); // Increment round count
-              updateBattle(
-                // Update battle data in database
-                userId,
-                finalCount,
-                count,
-                fighter,
-                initialModel[count],
-                'Model A',
-                prompt[count],
-                modelA,
-                modelB
-              );
-            }}
+            onClick={() => buttonAction('Model A')}
           />
-          <Button
-            text={'Tie ❌'}
-            onClick={() => {
-              battleChange(); // Increment round count
-              updateBattle(
-                // Update battle data in database
-                userId,
-                finalCount,
-                count,
-                fighter,
-                initialModel[count],
-                'tie',
-                prompt[count],
-                modelA,
-                modelB
-              );
-            }}
-          />
+          <Button text={'Tie ❌'} onClick={() => buttonAction('tie')} />
           <Button
             text={'I prefer Model B 🤖'}
-            onClick={() => {
-              battleChange(); // Increment round count
-              updateBattle(
-                // Update battle data in database
-                userId,
-                finalCount,
-                count,
-                fighter,
-                initialModel[count],
-                'Model B',
-                prompt[count],
-                modelA,
-                modelB
-              );
-            }}
+            onClick={() => buttonAction('Model B')}
           />
         </section>
       </section>
