@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const [showPopUp, setShowPopUp] = useState(true);
+  // const [showPopUp, setShowPopUp] = useState(true);
   const [isScreenSmall, setIsScreenSmall] = useState(false);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function App() {
       <BattleId>
         <QueryClientProvider client={queryClient}>
           {isScreenSmall && <ScreenWidth />}
-          {showPopUp && <PopUp onClose={() => setShowPopUp(false)} />}
+          {/* {showPopUp && <PopUp onClose={() => setShowPopUp(false)} />} */}
           <section className="ml-36 flex h-20 w-full items-end justify-between text-4xl">
             <h1 className="text-2xl text-white">AI BATTLE ⚔️</h1>
           </section>

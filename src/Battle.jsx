@@ -1,15 +1,15 @@
 import { groqChat } from './fetchRequests/groq-fetch.js';
 import { useState, useEffect, useContext } from 'react';
-import BattleModel from './Components/BattleModel.jsx';
-import Prompt from './Components/Prompt.jsx';
-import BattleBox from './Components/BattleBox.jsx';
 import { useQuery } from '@tanstack/react-query';
-import BattleLoading from './Components/BattleBox(loading).jsx';
-import Button from './Components/Button.jsx';
-import GameOver from './Components/GameOver.jsx';
 import { prompt, model } from './prompt-model.js';
 import { updateBattle } from './fetchRequests/db-fetch.js';
 import { BattleContext } from './Components/BattleId.jsx';
+import Prompt from './Components/Prompt.jsx';
+import BattleBox from './Components/BattleBox.jsx';
+import BattleLoading from './Components/BattleBox(loading).jsx';
+import Button from './Components/Button.jsx';
+import GameOver from './Components/GameOver.jsx';
+import ModelDisplay from './Components/ModelDisplay.jsx';
 
 // Initial setup
 const initialModel = [...model]; // Copy the model array
@@ -45,7 +45,6 @@ const Battle = () => {
 
   // Effect to update query keys and content based on count and fighter/model changes
   useEffect(() => {
-    console.log('Count or fighter changed:', count, fighter);
     if (count >= initialModel.length) {
       setCount(initialModel.length - 1); // Ensure count stays within bounds
       return;
@@ -70,7 +69,6 @@ const Battle = () => {
   } = useQuery({
     queryKey: queryKeyA,
     queryFn: () => {
-      console.log('Fetching modelA:', queryKeyA);
       if (queryKeyA[1] && queryKeyA[2]) {
         return groqChat(queryKeyA[1], queryKeyA[2]);
       } else {
@@ -88,7 +86,6 @@ const Battle = () => {
   } = useQuery({
     queryKey: queryKeyB,
     queryFn: () => {
-      console.log('Fetching modelB:', queryKeyB);
       if (queryKeyB[1] && queryKeyB[2]) {
         return groqChat(queryKeyB[1], queryKeyB[2]);
       } else {
@@ -100,7 +97,6 @@ const Battle = () => {
 
   // Update content when model A data changes
   useEffect(() => {
-    console.log('modelA changed:', modelA);
     if (errorA) {
       console.error('Error fetching modelA:', errorA);
     }
@@ -115,7 +111,6 @@ const Battle = () => {
 
   // Update content when model B data changes
   useEffect(() => {
-    console.log('modelB changed:', modelB);
     if (errorB) {
       console.error('Error fetching modelB:', errorB);
     }
@@ -137,7 +132,6 @@ const Battle = () => {
 
   // Function to handle round changes
   const battleChange = () => {
-    console.log('Changing battle round...');
     setCount((prevCount) => prevCount + 1); // Increment round count
   };
 
@@ -190,21 +184,11 @@ const Battle = () => {
     <>
       {content.prompt}
       <section className="mt-10 h-screen pb-28">
-        <section className="flex h-3/4 w-screen items-start justify-center">
-          <div className="h-full w-5/12">
-            <div className="relative h-full w-full rounded-lg border-2 border-lime-500 p-6">
-              <BattleModel model={'Model A'} />
-              {content.boxA}
-            </div>
-          </div>
-          <div className="ml-10 h-full w-5/12">
-            <div className="relative h-full w-full rounded-lg border-2 border-lime-500 p-6">
-              <BattleModel model={'Model B'} />
-              {content.boxB}
-            </div>
-          </div>
+        <section className="flex h-3/4 w-screen items-start justify-center gap-x-10">
+          <ModelDisplay modelLabel={'MODEL A'} boxContent={content.boxA} />
+          <ModelDisplay modelLabel={'MODEL B'} boxContent={content.boxB} />
         </section>
-        <section className="mt-7 flex w-full items-start justify-center gap-x-10">
+        <section className="mt-5 flex w-full items-start justify-center gap-x-10">
           <Button
             text={'I prefer Model A 🤖'}
             onClick={() => {
