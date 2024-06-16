@@ -1,8 +1,8 @@
-import { groqChat } from './fetchRequests/groq-fetch.js';
 import { useState, useEffect, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { prompt, model } from './prompt-model.js';
+import { groqChat } from './fetchRequests/groq-fetch.js';
 import { updateBattle } from './fetchRequests/db-fetch.js';
+import { prompt, model } from './prompt-model.js';
 import { BattleContext } from './Components/BattleId.jsx';
 import Prompt from './Components/Prompt.jsx';
 import BattleBox from './Components/BattleBox.jsx';
@@ -22,7 +22,7 @@ const Battle = () => {
   const [count, setCount] = useState(0); // Track rounds
   const [finalCount, setFinalCount] = useState(0); // Track total battles
   const { userId } = useContext(BattleContext); // Get user ID from context
-  const [updateCounter, setUpdateCounter] = useState(0); //Used for animation purposes only
+  const [updateCounter, setUpdateCounter] = useState(0); // Used for animation purposes only
 
   // State for query keys
   const [queryKeyA, setQueryKeyA] = useState([
@@ -56,79 +56,71 @@ const Battle = () => {
     setContent({
       prompt: <Prompt prompt={prompt[count]} />,
       boxA: <BattleBox model={null} id={`A-${updateCounter}`} />, // Placeholder until data is fetched
-      boxB: <BattleBox model={null} id={`A-${updateCounter}`} />, // Placeholder until data is fetched
+      boxB: <BattleBox model={null} id={`B-${updateCounter}`} />, // Placeholder until data is fetched
     });
     // eslint-disable-next-line
   }, [count, fighter, modelList]);
 
-  // Fetch model A data
+  // Fetch model data
+  const fetchModelData = (queryKey) => {
+    return queryKey[1] && queryKey[2]
+      ? groqChat(queryKey[1], queryKey[2])
+      : Promise.resolve(null);
+  };
+
   const {
     data: modelA,
     isLoading: isLoadingA,
     error: errorA,
   } = useQuery({
     queryKey: queryKeyA,
-    queryFn: () => {
-      if (queryKeyA[1] && queryKeyA[2]) {
-        return groqChat(queryKeyA[1], queryKeyA[2]);
-      } else {
-        return Promise.resolve(null);
-      }
-    },
-    enabled: !!queryKeyA[1] && !!queryKeyA[2], // Enable query when necessary data is available
+    queryFn: () => fetchModelData(queryKeyA),
+    enabled: !!queryKeyA[1] && !!queryKeyA[2],
   });
 
-  // Fetch model B data
   const {
     data: modelB,
     isLoading: isLoadingB,
     error: errorB,
   } = useQuery({
     queryKey: queryKeyB,
-    queryFn: () => {
-      if (queryKeyB[1] && queryKeyB[2]) {
-        return groqChat(queryKeyB[1], queryKeyB[2]);
-      } else {
-        return Promise.resolve(null);
-      }
-    },
-    enabled: !!queryKeyB[1] && !!queryKeyB[2], // Enable query when necessary data is available
+    queryFn: () => fetchModelData(queryKeyB),
+    enabled: !!queryKeyB[1] && !!queryKeyB[2],
   });
 
-  // Update content when model A data changes
+  // Update content when model data changes
+  const updateContent = (model, id) => {
+    setContent((prevContent) => ({
+      ...prevContent,
+      [id]: <BattleBox model={model} id={`${id}-${updateCounter}`} />,
+    }));
+  };
+
   useEffect(() => {
     if (errorA) {
       console.error('Error fetching modelA:', errorA);
     }
     if (!isLoadingA && modelA !== null) {
-      setContent((prevContent) => ({
-        ...prevContent,
-        boxA: <BattleBox model={modelA} id={`A-${updateCounter}`} />,
-      }));
+      updateContent(modelA, 'boxA');
     }
     // eslint-disable-next-line
   }, [isLoadingA, modelA, errorA]);
 
-  // Update content when model B data changes
   useEffect(() => {
     if (errorB) {
       console.error('Error fetching modelB:', errorB);
     }
     if (!isLoadingB && modelB !== null) {
-      setContent((prevContent) => ({
-        ...prevContent,
-        boxB: <BattleBox model={modelB} id={`B-${updateCounter}`} />,
-      }));
+      updateContent(modelB, 'boxB');
     }
     // eslint-disable-next-line
   }, [isLoadingB, modelB, errorB]);
 
   useEffect(() => {
     if (modelA || modelB) {
-      // Check if either modelA or modelB has new data
       setUpdateCounter((prev) => prev + 1); // Increment the counter to trigger animation
     }
-  }, [modelA, modelB]); // Depend on modelA and modelB
+  }, [modelA, modelB]);
 
   // Function to handle round changes
   const battleChange = () => {
