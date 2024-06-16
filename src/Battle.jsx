@@ -22,6 +22,7 @@ const Battle = () => {
   const [count, setCount] = useState(0); // Track rounds
   const [finalCount, setFinalCount] = useState(0); // Track total battles
   const { userId } = useContext(BattleContext); // Get user ID from context
+  const [updateCounter, setUpdateCounter] = useState(0);
 
   // State for query keys
   const [queryKeyA, setQueryKeyA] = useState([
@@ -35,29 +36,41 @@ const Battle = () => {
     prompt[count],
   ]);
 
+  // State for content to be displayed
+  const [content, setContent] = useState({
+    prompt: <Prompt prompt={prompt[count]} />,
+    boxA: <BattleBox model={null} id={'A'} />, // Placeholder until data is fetched
+    boxB: <BattleBox model={null} id={'B'} />, // Placeholder until data is fetched
+  });
+
   // Effect to update query keys and content based on count and fighter/model changes
   useEffect(() => {
+    console.log('Count or fighter changed:', count, fighter);
     if (count >= initialModel.length) {
       setCount(initialModel.length - 1); // Ensure count stays within bounds
       return;
     }
 
-    if (fighter && initialModel[count]) {
-      setQueryKeyA(['modelA', fighter, prompt[count]]);
-      setQueryKeyB(['modelB', initialModel[count], prompt[count]]);
-      setContent({
-        prompt: <Prompt prompt={prompt[count]} />,
-        boxA: <BattleBox model={null} id={'A'} />, // Placeholder until data is fetched
-        boxB: <BattleBox model={null} id={'B'} />, // Placeholder until data is fetched
-      });
-    }
+    setQueryKeyA(['modelA', fighter, prompt[count]]);
+    setQueryKeyB(['modelB', initialModel[count], prompt[count]]);
+
+    setContent({
+      prompt: <Prompt prompt={prompt[count]} />,
+      boxA: <BattleBox model={null} id={`A-${updateCounter}`} />, // Placeholder until data is fetched
+      boxB: <BattleBox model={null} id={`A-${updateCounter}`} />, // Placeholder until data is fetched
+    });
     // eslint-disable-next-line
-  }, [count, fighter]);
+  }, [count, fighter, initialModel]);
 
   // Fetch model A data
-  const { data: modelA, isLoading: isLoadingA } = useQuery({
+  const {
+    data: modelA,
+    isLoading: isLoadingA,
+    error: errorA,
+  } = useQuery({
     queryKey: queryKeyA,
     queryFn: () => {
+      console.log('Fetching modelA:', queryKeyA);
       if (queryKeyA[1] && queryKeyA[2]) {
         return groqChat(queryKeyA[1], queryKeyA[2]);
       } else {
@@ -68,9 +81,14 @@ const Battle = () => {
   });
 
   // Fetch model B data
-  const { data: modelB, isLoading: isLoadingB } = useQuery({
+  const {
+    data: modelB,
+    isLoading: isLoadingB,
+    error: errorB,
+  } = useQuery({
     queryKey: queryKeyB,
     queryFn: () => {
+      console.log('Fetching modelB:', queryKeyB);
       if (queryKeyB[1] && queryKeyB[2]) {
         return groqChat(queryKeyB[1], queryKeyB[2]);
       } else {
@@ -80,37 +98,67 @@ const Battle = () => {
     enabled: !!queryKeyB[1] && !!queryKeyB[2], // Enable query when necessary data is available
   });
 
-  // State for content to be displayed
-  const [content, setContent] = useState({
-    prompt: <Prompt prompt={prompt[count]} />,
-    boxA: <BattleBox model={modelA} id={'A'} />, // Display fetched data for model A
-    boxB: <BattleBox model={modelB} id={'B'} />, // Display fetched data for model B
-  });
-
   // Update content when model A data changes
   useEffect(() => {
+    console.log('modelA changed:', modelA);
+    if (errorA) {
+      console.error('Error fetching modelA:', errorA);
+    }
     if (!isLoadingA && modelA !== null) {
       setContent((prevContent) => ({
         ...prevContent,
-        boxA: <BattleBox model={modelA} id={'A'} />,
+        boxA: <BattleBox model={modelA} id={`A-${updateCounter}`} />,
       }));
     }
-  }, [isLoadingA, modelA]);
+    // eslint-disable-next-line
+  }, [isLoadingA, modelA, errorA]);
 
   // Update content when model B data changes
   useEffect(() => {
+    console.log('modelB changed:', modelB);
+    if (errorB) {
+      console.error('Error fetching modelB:', errorB);
+    }
     if (!isLoadingB && modelB !== null) {
       setContent((prevContent) => ({
         ...prevContent,
-        boxB: <BattleBox model={modelB} id={'B'} />,
+        boxB: <BattleBox model={modelB} id={`B-${updateCounter}`} />,
       }));
     }
-  }, [isLoadingB, modelB]);
+    // eslint-disable-next-line
+  }, [isLoadingB, modelB, errorB]);
+
+  useEffect(() => {
+    if (modelA || modelB) {
+      // Check if either modelA or modelB has new data
+      setUpdateCounter((prev) => prev + 1); // Increment the counter to trigger animation
+    }
+  }, [modelA, modelB]); // Depend on modelA and modelB
 
   // Function to handle round changes
   const battleChange = () => {
+    console.log('Changing battle round...');
     setCount((prevCount) => prevCount + 1); // Increment round count
   };
+
+  // Logic to select new fighters and increment finalCount after 3 rounds
+  useEffect(() => {
+    if (count === 3) {
+      let newFighter;
+      do {
+        randomIndex = Math.floor(Math.random() * initialModel.length);
+        newFighter = initialModel[randomIndex];
+      } while (previousFighter.includes(newFighter));
+
+      previousFighter.push(fighter);
+      fighter = newFighter;
+      setCount(0); // Reset round count
+      setFinalCount((prevCount) => prevCount + 1); // Increment total battle count
+      console.log('New fighter selected:', fighter);
+      console.log('Final count incremented:', finalCount);
+    }
+    // eslint-disable-next-line
+  }, [count, finalCount, fighter, initialModel, previousFighter]);
 
   // Alert user on page unload if battles are in progress
   useEffect(() => {
@@ -138,22 +186,6 @@ const Battle = () => {
     return <BattleLoading />;
   }
 
-  // Logic to select new fighters and increment finalCount after 3 rounds
-  if (count === 3) {
-    let newFighter;
-    do {
-      randomIndex = Math.floor(Math.random() * initialModel.length);
-      newFighter = initialModel.splice(randomIndex, 1)[0];
-    } while (previousFighter.includes(newFighter));
-
-    initialModel.push(fighter);
-    previousFighter.push(fighter);
-    fighter = newFighter;
-    setCount(0);
-    setFinalCount((prevCount) => prevCount + 1);
-  }
-
-  // JSX to render battle components
   return (
     <>
       {content.prompt}

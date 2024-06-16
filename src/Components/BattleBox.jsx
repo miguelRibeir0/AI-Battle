@@ -4,7 +4,9 @@ const BattleBox = ({ model, id }) => {
   return (
     <div className="h-full overflow-y-auto scrollbar scrollbar-track-transparent scrollbar-thumb-lime-500">
       <div key={id} className="divr-3 animate-fadeIn text-white">
-        {formatText(model)}
+        {typeof model === 'string'
+          ? formatText(model)
+          : 'Error fetching the content'}
       </div>
     </div>
   );
