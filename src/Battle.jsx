@@ -12,9 +12,9 @@ import GameOver from './Components/GameOver.jsx';
 import ModelDisplay from './Components/ModelDisplay.jsx';
 
 // Initial setup
-const initialModel = [...model]; // Copy the model array
-let randomIndex = Math.floor(Math.random() * initialModel.length);
-let fighter = initialModel.splice(randomIndex, 1)[0]; // Randomly select initial fighter
+const modelList = [...model]; // Copy the model array
+let randomIndex = Math.floor(Math.random() * modelList.length);
+let fighter = modelList.splice(randomIndex, 1)[0]; // Randomly select initial fighter
 const previousFighter = []; // Array to keep track of previous fighters
 
 const Battle = () => {
@@ -22,7 +22,7 @@ const Battle = () => {
   const [count, setCount] = useState(0); // Track rounds
   const [finalCount, setFinalCount] = useState(0); // Track total battles
   const { userId } = useContext(BattleContext); // Get user ID from context
-  const [updateCounter, setUpdateCounter] = useState(0);
+  const [updateCounter, setUpdateCounter] = useState(0); //Used for animation purposes only
 
   // State for query keys
   const [queryKeyA, setQueryKeyA] = useState([
@@ -32,7 +32,7 @@ const Battle = () => {
   ]);
   const [queryKeyB, setQueryKeyB] = useState([
     'modelB',
-    initialModel[count],
+    modelList[count],
     prompt[count],
   ]);
 
@@ -45,13 +45,13 @@ const Battle = () => {
 
   // Effect to update query keys and content based on count and fighter/model changes
   useEffect(() => {
-    if (count >= initialModel.length) {
-      setCount(initialModel.length - 1); // Ensure count stays within bounds
+    if (count >= modelList.length) {
+      setCount(modelList.length - 1); // Ensure count stays within bounds
       return;
     }
 
     setQueryKeyA(['modelA', fighter, prompt[count]]);
-    setQueryKeyB(['modelB', initialModel[count], prompt[count]]);
+    setQueryKeyB(['modelB', modelList[count], prompt[count]]);
 
     setContent({
       prompt: <Prompt prompt={prompt[count]} />,
@@ -59,7 +59,7 @@ const Battle = () => {
       boxB: <BattleBox model={null} id={`A-${updateCounter}`} />, // Placeholder until data is fetched
     });
     // eslint-disable-next-line
-  }, [count, fighter, initialModel]);
+  }, [count, fighter, modelList]);
 
   // Fetch model A data
   const {
@@ -138,21 +138,27 @@ const Battle = () => {
   // Logic to select new fighters and increment finalCount after 3 rounds
   useEffect(() => {
     if (count === 3) {
+      // Add the current fighter back to modelList
+      modelList.push(fighter);
       let newFighter;
+
       do {
-        randomIndex = Math.floor(Math.random() * initialModel.length);
-        newFighter = initialModel[randomIndex];
+        randomIndex = Math.floor(Math.random() * modelList.length);
+        newFighter = modelList[randomIndex];
       } while (previousFighter.includes(newFighter));
 
-      previousFighter.push(fighter);
+      // Remove the newFighter from modelList to avoid re-selection in the immediate next round
+      modelList.splice(randomIndex, 1);
+
+      // Update previousFighter list
+      previousFighter.push(newFighter);
       fighter = newFighter;
+
       setCount(0); // Reset round count
       setFinalCount((prevCount) => prevCount + 1); // Increment total battle count
-      console.log('New fighter selected:', fighter);
-      console.log('Final count incremented:', finalCount);
     }
     // eslint-disable-next-line
-  }, [count, finalCount, fighter, initialModel, previousFighter]);
+  }, [count, finalCount, fighter, modelList, previousFighter]);
 
   // Alert user on page unload if battles are in progress
   useEffect(() => {
@@ -177,7 +183,7 @@ const Battle = () => {
       finalCount,
       count,
       fighter,
-      initialModel[count],
+      modelList[count],
       winner,
       prompt[count],
       modelA,
