@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk';
+import { system } from '../prompt-model';
 
 const groq = new Groq({
   apiKey: import.meta.env.VITE_GROQ_KEY,
@@ -11,12 +12,16 @@ async function getGroqChat(model, prompt) {
   return groq.chat.completions.create({
     messages: [
       {
+        role: 'system',
+        content: system,
+      },
+      {
         role: 'user',
         content: prompt,
       },
     ],
     model: model,
-    max_tokens: 200,
+    max_tokens: undefined,
   });
 }
 

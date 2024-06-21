@@ -1,99 +1,74 @@
-/* eslint-disable */
-import React from 'react';
-
 const formatText = (text) => {
   if (typeof text !== 'string') {
     return [];
   }
 
-  const paragraphs = text.split('\n\n').map((paragraph, index) => {
-    // Handle headings
-    if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
-      return (
-        <h2
-          key={index}
-          className="mb-2 mt-4 text-lg font-bold"
-          dangerouslySetInnerHTML={{
-            __html: paragraph.replace(/^\*\*(.*)\*\*$/, '$1'),
-          }}
-        ></h2>
-      );
-    }
-    // Handle numbered lists
-    else if (/^\d+\.\s/.test(paragraph)) {
-      const items = paragraph.split(/\n(?=\d+\.\s)/);
-      return (
-        <ol key={index} className="my-2 list-inside list-decimal">
-          {items.map((item, idx) => {
-            let formattedItem = item.replace(
-              /\*\*(.*?)\*\*/g,
-              '<strong>$1</strong>'
-            );
-            return (
-              <li
-                key={idx}
-                className="mb-2"
-                dangerouslySetInnerHTML={{
-                  __html: formattedItem.replace(/^\d+\.\s*/, ''),
-                }}
-              ></li>
-            );
-          })}
-        </ol>
-      );
-    }
-    // Handle bulleted lists with asterisks or hyphens
-    else if (/^(\*\s|-\s)/.test(paragraph)) {
-      const items = paragraph.split(/\n(?=\*\s|-\s)/);
-      return (
-        <ul key={index} className="my-2 list-inside list-disc">
-          {items.map((item, idx) => {
-            let formattedItem = item.replace(/^(\*\s|-\s)/, '');
-            formattedItem = formattedItem.replace(
-              /\*\*(.*?)\*\*/g,
-              '<strong>$1</strong>'
-            );
-            return (
-              <li
-                key={idx}
-                className="mb-2"
-                dangerouslySetInnerHTML={{
-                  __html: formattedItem,
-                }}
-              ></li>
-            );
-          })}
-        </ul>
-      );
-    }
-    // Handle regular paragraphs
-    else {
-      let formattedParagraph = paragraph.replace(
-        /\*\*(.*?)\*\*/g,
-        '<strong>$1</strong>'
-      );
-      return (
-        <div
-          key={index}
-          className="my-2"
-          dangerouslySetInnerHTML={{ __html: formattedParagraph }}
-        ></div>
-      );
-    }
-  });
+  const formatCodeBlock = (block, index) => {
+    const formattedBlock = block
+      .split('\n')
+      .map((line) => {
+        if (
+          line.startsWith('//') ||
+          line.trim().startsWith('IF') ||
+          line.trim().startsWith('SELECT')
+        ) {
+          return '  ' + line;
+        }
+        return line;
+      })
+      .join('\n');
 
-  // Insert space between topics
-  const spacedParagraphs = [];
-  paragraphs.forEach((para, index) => {
-    spacedParagraphs.push(para);
-    if (index < paragraphs.length - 1) {
-      spacedParagraphs.push(
-        <div key={`space-${index}`} className="my-4"></div>
-      );
-    }
-  });
+    return (
+      <pre
+        key={index}
+        className="mb-5 mt-5 overflow-x-auto rounded bg-gray-950 p-4 text-white"
+      >
+        {formattedBlock}
+      </pre>
+    );
+  };
 
-  return spacedParagraphs;
+  const formatBestPractices = (text) => {
+    return text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
+  };
+
+  const formatNoteTopics = (text) => {
+    return text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
+  };
+
+  const formatListItems = (text) => {
+    return text.replace(
+      /(^|\n)\* (.*?)(?=\n|$)/g,
+      '$1<h3 class="mt-3 mb-1">$2</h3>'
+    );
+  };
+
+  const blocks = text
+    .split(/(```[\s\S]*?```)/)
+    .map((block, index) => {
+      if (block.startsWith('```') && block.endsWith('```')) {
+        const codeContent = block.slice(3, -3).trim();
+        return formatCodeBlock(codeContent, index);
+      } else {
+        return block.split('\n\n').map((paragraph, pIndex) => {
+          let formattedParagraph = formatBestPractices(paragraph);
+          formattedParagraph = formatNoteTopics(formattedParagraph).replace(
+            /\*\*(.*?)\*\*/g,
+            '<div class="mt-5 mb-5"><strong>$1</strong></div>'
+          );
+          formattedParagraph = formatListItems(formattedParagraph);
+          return (
+            <p
+              key={`${index}-${pIndex}`}
+              dangerouslySetInnerHTML={{ __html: formattedParagraph }}
+            />
+          );
+        });
+      }
+    })
+    .flat();
+
+  return blocks;
 };
 
 export default formatText;

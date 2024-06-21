@@ -1,5 +1,5 @@
-import LoadingAnimation from './LoadingAnimation';
-import Prompt from './Prompt';
+import LoadingAnimation from '../LoadingAnimation';
+import Prompt from '../Prompt';
 import BattleModel from './BattleModel';
 
 //eslint-disable-next-line

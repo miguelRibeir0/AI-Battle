@@ -1,4 +1,4 @@
-import formatText from './FormatText';
+import formatText from '../FormatText';
 //eslint-disable-next-line
 const BattleBox = ({ model, id }) => {
   return (

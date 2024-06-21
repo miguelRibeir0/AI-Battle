@@ -5,9 +5,9 @@ import { updateBattle } from './fetchRequests/db-fetch.js';
 import { prompt, model } from './prompt-model.js';
 import { BattleContext } from './Components/BattleId.jsx';
 import Prompt from './Components/Prompt.jsx';
-import BattleBox from './Components/BattleBox.jsx';
-import BattleLoading from './Components/BattleBox(loading).jsx';
-import Button from './Components/Button.jsx';
+import BattleBox from './Components/BattleBox/BattleBox.jsx';
+import BattleLoading from './Components/BattleBox/BattleBox(loading).jsx';
+import Button from './Components/BattleBox/Button.jsx';
 import GameOver from './Components/GameOver.jsx';
 import ModelDisplay from './Components/ModelDisplay.jsx';
 
@@ -36,6 +36,25 @@ const Battle = () => {
     prompt[count],
   ]);
 
+  // Fetch model data
+  const fetchModelData = (queryKey) => {
+    return queryKey[1] && queryKey[2]
+      ? groqChat(queryKey[1], queryKey[2])
+      : Promise.resolve(null);
+  };
+
+  const { data: modelA, isLoading: isLoadingA } = useQuery({
+    queryKey: queryKeyA,
+    queryFn: () => fetchModelData(queryKeyA),
+    enabled: !!queryKeyA[1] && !!queryKeyA[2],
+  });
+
+  const { data: modelB, isLoading: isLoadingB } = useQuery({
+    queryKey: queryKeyB,
+    queryFn: () => fetchModelData(queryKeyB),
+    enabled: !!queryKeyB[1] && !!queryKeyB[2],
+  });
+
   // State for content to be displayed
   const [content, setContent] = useState({
     prompt: <Prompt prompt={prompt[count]} />,
@@ -61,33 +80,6 @@ const Battle = () => {
     // eslint-disable-next-line
   }, [count, fighter, modelList]);
 
-  // Fetch model data
-  const fetchModelData = (queryKey) => {
-    return queryKey[1] && queryKey[2]
-      ? groqChat(queryKey[1], queryKey[2])
-      : Promise.resolve(null);
-  };
-
-  const {
-    data: modelA,
-    isLoading: isLoadingA,
-    error: errorA,
-  } = useQuery({
-    queryKey: queryKeyA,
-    queryFn: () => fetchModelData(queryKeyA),
-    enabled: !!queryKeyA[1] && !!queryKeyA[2],
-  });
-
-  const {
-    data: modelB,
-    isLoading: isLoadingB,
-    error: errorB,
-  } = useQuery({
-    queryKey: queryKeyB,
-    queryFn: () => fetchModelData(queryKeyB),
-    enabled: !!queryKeyB[1] && !!queryKeyB[2],
-  });
-
   // Update content when model data changes
   const updateContent = (model, id) => {
     setContent((prevContent) => ({
@@ -97,24 +89,18 @@ const Battle = () => {
   };
 
   useEffect(() => {
-    if (errorA) {
-      console.error('Error fetching modelA:', errorA);
-    }
     if (!isLoadingA && modelA !== null) {
       updateContent(modelA, 'boxA');
     }
     // eslint-disable-next-line
-  }, [isLoadingA, modelA, errorA]);
+  }, [isLoadingA, modelA]);
 
   useEffect(() => {
-    if (errorB) {
-      console.error('Error fetching modelB:', errorB);
-    }
     if (!isLoadingB && modelB !== null) {
       updateContent(modelB, 'boxB');
     }
     // eslint-disable-next-line
-  }, [isLoadingB, modelB, errorB]);
+  }, [isLoadingB, modelB]);
 
   useEffect(() => {
     if (modelA || modelB) {

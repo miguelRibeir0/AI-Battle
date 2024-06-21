@@ -1,4 +1,4 @@
-import BattleModel from './BattleModel.jsx';
+import BattleModel from './BattleBox/BattleModel.jsx';
 
 //eslint-disable-next-line
 const ModelDisplay = ({ modelLabel, boxContent }) => (
