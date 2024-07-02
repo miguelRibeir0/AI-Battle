@@ -57,10 +57,54 @@ const formatText = (text) => {
     return formattedLines.join('\n');
   };
 
+  const formatJCLCode = (code) => {
+    const lines = code.split('\n');
+    const keywords = [
+      'JOB',
+      'EXEC',
+      'DD',
+      'SYSOUT',
+      'SYSIN',
+      'DISP',
+      'DSN',
+      'UNIT',
+      'VOL',
+      'SPACE',
+      'DCB',
+      'NEW',
+      'OLD',
+      'SHR',
+      'CATLG',
+      'DELETE',
+      'KEEP',
+      'IEFBR14',
+      'SELECT',
+      'UNLOAD',
+      'WHERE',
+      'OUTPUT',
+      'FIELDS',
+    ];
+
+    const formattedLines = lines.map((line) => {
+      let highlightedLine = line;
+      keywords.forEach((keyword) => {
+        const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+        highlightedLine = highlightedLine.replace(
+          regex,
+          `<span class="jcl-keyword">${keyword}</span>`
+        );
+      });
+      return highlightedLine;
+    });
+    return formattedLines.join('\n');
+  };
+
   const formatCodeBlock = (block, index, language = '') => {
     let formattedBlock = block;
     if (language.toLowerCase() === 'cobol') {
       formattedBlock = formatCOBOLCode(block);
+    } else if (language.toLowerCase() === 'jcl') {
+      formattedBlock = formatJCLCode(block);
     }
     return (
       <pre
@@ -72,6 +116,14 @@ const formatText = (text) => {
       </pre>
     );
   };
+
+  const isJCL =
+    text.includes('//') || text.includes('JOB') || text.includes('EXEC');
+
+  if (isJCL) {
+    // Directly format the entire text as a JCL code block if JCL pattern is detected
+    return [formatCodeBlock(text, 0, 'jcl')];
+  }
 
   const formatBestPractices = (text) =>
     text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
@@ -92,7 +144,7 @@ const formatText = (text) => {
   );
 
   if (!containsFormattingMarkers) {
-    return [formatCodeBlock(text, 0, 'cobol')];
+    return [formatCodeBlock(text, 0, 'jcl')];
   }
 
   lines.forEach((line, index) => {

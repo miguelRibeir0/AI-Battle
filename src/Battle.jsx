@@ -87,14 +87,6 @@ const Battle = () => {
     return <BattleLoading />;
   }
 
-  console.log(
-    fighter,
-    modelList[count % modelList.length],
-    modelList,
-    count,
-    finalCount
-  );
-
   return (
     <>
       <Prompt
@@ -106,11 +98,11 @@ const Battle = () => {
         <section className="flex h-3/4 w-screen items-start justify-center gap-x-10">
           <ModelDisplay
             modelLabel={'MODEL A'}
-            boxContent={<BattleBox model={modelAData} id={'A'} />}
+            boxContent={<BattleBox model={modelAData} id={'A' + count} />}
           />
           <ModelDisplay
             modelLabel={'MODEL B'}
-            boxContent={<BattleBox model={modelBData} id={'B'} />}
+            boxContent={<BattleBox model={modelBData} id={'B' + count} />}
           />
         </section>
         <section className="mt-5 flex w-full items-start justify-center gap-x-10">

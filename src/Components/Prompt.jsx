@@ -37,11 +37,11 @@ const Prompt = ({ prompt, count, finalCount }) => {
         >
           <div className="max-h-3/4 w-1/2 overflow-y-auto border-2 border-lime-500 bg-gray-900">
             <p className="p-10 pb-0 text-white">
-              <span className="font-bold">System:</span>{' '}
-              {prompt == systemChange ? system[1] : system[0]}
+              <span className="font-bold">Prompt:</span> {prompt}
             </p>
             <p className="p-10 text-white">
-              <span className="font-bold">Prompt:</span> {prompt}
+              <span className="font-bold">System:</span>{' '}
+              {prompt == systemChange ? system[1] : system[0]}
             </p>
           </div>
           <span></span>
