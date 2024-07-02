@@ -6,6 +6,9 @@ const groq = new Groq({
   dangerouslyAllowBrowser: true, // CHANGE THIS TO SERVER SIDE
 });
 
+const systemChange =
+  'Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.';
+
 // model list: LLaMA3 8b , LLaMA3 70b , Mixtral 8x7b , Gemma 7b
 
 async function getGroqChat(model, prompt) {
@@ -13,7 +16,7 @@ async function getGroqChat(model, prompt) {
     messages: [
       {
         role: 'system',
-        content: system,
+        content: systemChange == prompt ? system[1] : system[0],
       },
       {
         role: 'user',

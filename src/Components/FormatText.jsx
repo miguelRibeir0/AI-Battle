@@ -3,70 +3,131 @@ const formatText = (text) => {
     return [];
   }
 
-  const formatCodeBlock = (block, index) => {
-    const formattedBlock = block
-      .split('\n')
-      .map((line) => {
-        if (
-          line.startsWith('//') ||
-          line.trim().startsWith('IF') ||
-          line.trim().startsWith('SELECT')
-        ) {
-          return '  ' + line;
-        }
-        return line;
-      })
-      .join('\n');
+  const formatCOBOLCode = (code) => {
+    const lines = code.split('\n');
+    const keywords = [
+      'IDENTIFICATION DIVISION',
+      'PROGRAM-ID',
+      'ENVIRONMENT DIVISION',
+      'DATA DIVISION',
+      'PROCEDURE DIVISION',
+      'WORKING-STORAGE SECTION',
+      'FILE SECTION',
+      'READ',
+      'WRITE',
+      'ADD',
+      'SUBTRACT',
+      'MULTIPLY',
+      'DIVIDE',
+      'END-IF',
+      'IF',
+      'ELSE',
+      'PERFORM',
+      'UNTIL',
+      'STOP RUN',
+      'ACCEPT',
+      'STRING',
+      'COMPUTE',
+      'SELECT',
+      'ASSIGN',
+      'FROM',
+      'INTO',
+      'PIC',
+      'VALUE',
+      'ZERO',
+      'NOT',
+      'EQUAL',
+      'THEN',
+      'OR',
+      'BY',
+      'SPACE',
+    ];
 
+    const formattedLines = lines.map((line) => {
+      let highlightedLine = line;
+      keywords.forEach((keyword) => {
+        const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+        highlightedLine = highlightedLine.replace(
+          regex,
+          `<span class="cobol-keyword">${keyword}</span>`
+        );
+      });
+      return highlightedLine;
+    });
+    return formattedLines.join('\n');
+  };
+
+  const formatCodeBlock = (block, index, language = '') => {
+    let formattedBlock = block;
+    if (language.toLowerCase() === 'cobol') {
+      formattedBlock = formatCOBOLCode(block);
+    }
     return (
       <pre
         key={index}
-        className="mb-5 mt-5 overflow-x-auto rounded bg-gray-950 p-4 text-white"
+        className={`mb-5 mt-5 overflow-x-auto rounded bg-gray-950 p-4 text-white ${language}`}
+        style={{ whiteSpace: 'pre-wrap' }}
       >
-        {formattedBlock}
+        <code dangerouslySetInnerHTML={{ __html: formattedBlock }}></code>
       </pre>
     );
   };
 
-  const formatBestPractices = (text) => {
-    return text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
-  };
+  const formatBestPractices = (text) =>
+    text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
+  const formatNoteTopics = (text) => text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
+  const formatListItems = (text) =>
+    text.replace(/(^|\n)\* (.*?)(?=\n|$)/g, '$1<h3 class="mt-3 mb-1">$2</h3>');
+  const formatBoldText = (text) =>
+    text.replace(/\*\*(.*?)\*\*/g, '<strong class="mt-2 mb-2">$1</strong>');
 
-  const formatNoteTopics = (text) => {
-    return text.replace(/\* (.*?):/g, '<h3>$1:</h3>');
-  };
+  const blocks = [];
+  let codeBlock = [];
+  let inCodeBlock = false;
+  let language = '';
 
-  const formatListItems = (text) => {
-    return text.replace(
-      /(^|\n)\* (.*?)(?=\n|$)/g,
-      '$1<h3 class="mt-3 mb-1">$2</h3>'
-    );
-  };
+  const lines = text.split('\n');
+  const containsFormattingMarkers = lines.some((line) =>
+    line.trim().match(/^\*|\*\*|```/)
+  );
 
-  const blocks = text
-    .split(/(```[\s\S]*?```)/)
-    .map((block, index) => {
-      if (block.startsWith('```') && block.endsWith('```')) {
-        const codeContent = block.slice(3, -3).trim();
-        return formatCodeBlock(codeContent, index);
+  if (!containsFormattingMarkers) {
+    return [formatCodeBlock(text, 0, 'cobol')];
+  }
+
+  lines.forEach((line, index) => {
+    const codeBlockStartMatch = line.trim().match(/^```(\S*)/);
+    if (codeBlockStartMatch) {
+      if (inCodeBlock) {
+        blocks.push(
+          formatCodeBlock(codeBlock.join('\n'), blocks.length, language)
+        );
+        codeBlock = [];
+        inCodeBlock = false;
+        language = '';
       } else {
-        return block.split('\n\n').map((paragraph, pIndex) => {
-          let formattedParagraph = formatBestPractices(paragraph);
-          formattedParagraph = formatNoteTopics(formattedParagraph).replace(
-            /\*\*(.*?)\*\*/g,
-            '<div class="mt-5 mb-5"><strong>$1</strong></div>'
-          );
-          formattedParagraph = formatListItems(formattedParagraph);
-          return (
-            <p
-              key={`${index}-${pIndex}`}
-              dangerouslySetInnerHTML={{ __html: formattedParagraph }}
-            />
-          );
-        });
+        inCodeBlock = true;
+        language = codeBlockStartMatch[1];
       }
-    })
-    .flat();
+    } else if (inCodeBlock) {
+      codeBlock.push(line);
+    } else {
+      blocks.push(
+        <p
+          key={`${index}`}
+          dangerouslySetInnerHTML={{
+            __html: formatListItems(
+              formatNoteTopics(formatBestPractices(formatBoldText(line)))
+            ),
+          }}
+        />
+      );
+    }
+  });
+
+  if (codeBlock.length > 0) {
+    blocks.push(formatCodeBlock(codeBlock.join('\n'), blocks.length, language));
+  }
 
   return blocks;
 };

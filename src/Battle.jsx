@@ -1,9 +1,8 @@
-import { useState, useEffect, useContext } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { groqChat } from './fetchRequests/groq-fetch.js';
-import { updateBattle } from './fetchRequests/db-fetch.js';
+import { startBattle } from './fetchRequests/db-fetch.js';
 import { prompt, model } from './prompt-model.js';
-import { BattleContext } from './Components/BattleId.jsx';
 import Prompt from './Components/Prompt.jsx';
 import BattleBox from './Components/BattleBox/BattleBox.jsx';
 import BattleLoading from './Components/BattleBox/BattleBox(loading).jsx';
@@ -11,191 +10,118 @@ import Button from './Components/BattleBox/Button.jsx';
 import GameOver from './Components/GameOver.jsx';
 import ModelDisplay from './Components/ModelDisplay.jsx';
 
-// Initial setup
-const modelList = [...model]; // Copy the model array
-let randomIndex = Math.floor(Math.random() * modelList.length);
-let fighter = modelList.splice(randomIndex, 1)[0]; // Randomly select initial fighter
-const previousFighter = []; // Array to keep track of previous fighters
-
 const Battle = () => {
-  // State variables
-  const [count, setCount] = useState(0); // Track rounds
-  const [finalCount, setFinalCount] = useState(0); // Track total battles
-  const { userId } = useContext(BattleContext); // Get user ID from context
-  const [updateCounter, setUpdateCounter] = useState(0); // Used for animation purposes only
-
-  // State for query keys
-  const [queryKeyA, setQueryKeyA] = useState([
-    'modelA',
-    fighter,
-    prompt[count],
+  const fighterIndex = Math.floor(Math.random() * model.length); // Select a random index for fighter
+  const [count, setCount] = useState(0);
+  const [finalCount, setFinalCount] = useState(0);
+  const [fighter, setFighter] = useState(() => model[fighterIndex]); // Use the index to set fighter
+  const [modelList, setModelList] = useState([
+    ...model.slice(0, fighterIndex), // Elements before the fighter
+    ...model.slice(fighterIndex + 1), // Ensuring duplicates of fighter remain if present // for testing only
   ]);
-  const [queryKeyB, setQueryKeyB] = useState([
-    'modelB',
-    modelList[count],
-    prompt[count],
-  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [modelAData, setModelAData] = useState(null);
+  const [modelBData, setModelBData] = useState(null);
 
-  // Fetch model data
-  const fetchModelData = (queryKey) => {
-    return queryKey[1] && queryKey[2]
-      ? groqChat(queryKey[1], queryKey[2])
-      : Promise.resolve(null);
-  };
+  const queryClient = useQueryClient();
 
-  const { data: modelA, isLoading: isLoadingA } = useQuery({
-    queryKey: queryKeyA,
-    queryFn: () => fetchModelData(queryKeyA),
-    enabled: !!queryKeyA[1] && !!queryKeyA[2],
-  });
-
-  const { data: modelB, isLoading: isLoadingB } = useQuery({
-    queryKey: queryKeyB,
-    queryFn: () => fetchModelData(queryKeyB),
-    enabled: !!queryKeyB[1] && !!queryKeyB[2],
-  });
-
-  // State for content to be displayed
-  const [content, setContent] = useState({
-    prompt: <Prompt prompt={prompt[count]} />,
-    boxA: <BattleBox model={null} id={'A'} />, // Placeholder until data is fetched
-    boxB: <BattleBox model={null} id={'B'} />, // Placeholder until data is fetched
-  });
-
-  // Effect to update query keys and content based on count and fighter/model changes
-  useEffect(() => {
-    if (count >= modelList.length) {
-      setCount(modelList.length - 1); // Ensure count stays within bounds
-      return;
-    }
-
-    setQueryKeyA(['modelA', fighter, prompt[count]]);
-    setQueryKeyB(['modelB', modelList[count], prompt[count]]);
-
-    setContent({
-      prompt: <Prompt prompt={prompt[count]} />,
-      boxA: <BattleBox model={null} id={`A-${updateCounter}`} />, // Placeholder until data is fetched
-      boxB: <BattleBox model={null} id={`B-${updateCounter}`} />, // Placeholder until data is fetched
-    });
-    // eslint-disable-next-line
-  }, [count, fighter, modelList]);
-
-  // Update content when model data changes
-  const updateContent = (model, id) => {
-    setContent((prevContent) => ({
-      ...prevContent,
-      [id]: <BattleBox model={model} id={`${id}-${updateCounter}`} />,
-    }));
-  };
+  const fetchModelData = useCallback(async () => {
+    setIsLoading(true);
+    const fetchedModelAData = await groqChat(fighter, prompt[finalCount]);
+    const fetchedModelBData = await groqChat(
+      modelList[count % modelList.length],
+      prompt[finalCount]
+    );
+    // Update the state with the fetched data
+    setModelAData(fetchedModelAData);
+    setModelBData(fetchedModelBData);
+    setIsLoading(false);
+    //eslint-disable-next-line
+  }, [fighter, modelList, count, finalCount, queryClient]);
 
   useEffect(() => {
-    if (!isLoadingA && modelA !== null) {
-      updateContent(modelA, 'boxA');
-    }
-    // eslint-disable-next-line
-  }, [isLoadingA, modelA]);
+    fetchModelData();
+  }, [fetchModelData]);
 
-  useEffect(() => {
-    if (!isLoadingB && modelB !== null) {
-      updateContent(modelB, 'boxB');
-    }
-    // eslint-disable-next-line
-  }, [isLoadingB, modelB]);
-
-  useEffect(() => {
-    if (modelA || modelB) {
-      setUpdateCounter((prev) => prev + 1); // Increment the counter to trigger animation
-    }
-  }, [modelA, modelB]);
-
-  // Function to handle round changes
   const battleChange = () => {
-    setCount((prevCount) => prevCount + 1); // Increment round count
+    let nextCount = count + 1;
+    if ([4, 7, 9].includes(nextCount)) {
+      setFighter(modelList[0]);
+      // Updating model list
+      setModelList((prevList) => prevList.filter((m, index) => index !== 0));
+    }
+    if (nextCount === 10) {
+      setFinalCount((prevFinalCount) => prevFinalCount + 1);
+      setCount(0);
+    } else {
+      // Only increment count if not resetting
+      setCount(nextCount);
+    }
   };
-
-  // Logic to select new fighters and increment finalCount after 3 rounds
-  useEffect(() => {
-    if (count === 3) {
-      // Add the current fighter back to modelList
-      modelList.push(fighter);
-      let newFighter;
-
-      do {
-        randomIndex = Math.floor(Math.random() * modelList.length);
-        newFighter = modelList[randomIndex];
-      } while (previousFighter.includes(newFighter));
-
-      // Remove the newFighter from modelList to avoid re-selection in the immediate next round
-      modelList.splice(randomIndex, 1);
-
-      // Update previousFighter list
-      previousFighter.push(newFighter);
-      fighter = newFighter;
-
-      setCount(0); // Reset round count
-      setFinalCount((prevCount) => prevCount + 1); // Increment total battle count
-    }
-    // eslint-disable-next-line
-  }, [count, finalCount, fighter, modelList, previousFighter]);
-
-  // Alert user on page unload if battles are in progress
-  useEffect(() => {
-    if (finalCount !== 4) {
-      const handleUnload = (event) => {
-        event.preventDefault();
-        event.returnValue = '';
-      };
-
-      window.addEventListener('beforeunload', handleUnload);
-
-      return () => {
-        window.removeEventListener('beforeunload', handleUnload);
-      };
-    }
-  }, [finalCount]);
 
   const buttonAction = (winner) => {
-    battleChange(); // Increment round count
-    updateBattle(
-      userId,
-      finalCount,
-      count,
+    battleChange();
+    startBattle(
       fighter,
-      modelList[count],
+      modelList[count % modelList.length],
       winner,
-      prompt[count],
-      modelA,
-      modelB
+      prompt[finalCount],
+      modelAData,
+      modelBData
     );
   };
 
-  // Display game over message when finalCount reaches 4
-  if (finalCount === 4) {
+  useEffect(() => {
+    // Reset modelList to include all models except the current fighter on reset
+    setModelList([
+      ...model.slice(0, fighterIndex),
+      ...model.slice(fighterIndex + 1),
+    ]); //eslint-disable-next-line
+  }, [finalCount]);
+
+  if (finalCount === 5) {
     return <GameOver />;
   }
 
-  // Display loading indicator while fetching data
-  if (isLoadingA || isLoadingB) {
+  if (isLoading) {
     return <BattleLoading />;
   }
 
+  console.log(
+    fighter,
+    modelList[count % modelList.length],
+    modelList,
+    count,
+    finalCount
+  );
+
   return (
     <>
-      {content.prompt}
+      <Prompt
+        prompt={prompt[finalCount]}
+        count={count}
+        finalCount={finalCount}
+      />
       <section className="mt-10 h-screen pb-28">
         <section className="flex h-3/4 w-screen items-start justify-center gap-x-10">
-          <ModelDisplay modelLabel={'MODEL A'} boxContent={content.boxA} />
-          <ModelDisplay modelLabel={'MODEL B'} boxContent={content.boxB} />
+          <ModelDisplay
+            modelLabel={'MODEL A'}
+            boxContent={<BattleBox model={modelAData} id={'A'} />}
+          />
+          <ModelDisplay
+            modelLabel={'MODEL B'}
+            boxContent={<BattleBox model={modelBData} id={'B'} />}
+          />
         </section>
         <section className="mt-5 flex w-full items-start justify-center gap-x-10">
           <Button
             text={'I prefer Model A 🤖'}
-            onClick={() => buttonAction('Model A')}
+            onClick={() => buttonAction('model_a')}
           />
           <Button text={'Tie ❌'} onClick={() => buttonAction('tie')} />
           <Button
             text={'I prefer Model B 🤖'}
-            onClick={() => buttonAction('Model B')}
+            onClick={() => buttonAction('model_b')}
           />
         </section>
       </section>
