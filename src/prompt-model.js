@@ -24,7 +24,7 @@ const model = [
   'llama3-8b-8192',
   'gemma-7b-it',
   'llama3-70b-8192',
-  'llama3-8b-8192',
+  'gemma2-9b-it',
 ];
 const system = [
   `ONLY OUTPUT CODE, NO EXPLANATION/INTRODUCTION/NOTES NEEDED. You are an expert in Job Control Language (JCL) and COBOL programming. Generate high-quality Job Control Language (JCL) code based on the following requirements:
