@@ -7,7 +7,7 @@ const GameOver = () => {
       <h3>
         Models Tested: [ &apos;llama3-8b-8192&apos;,
         &apos;mixtral-8x7b-32768&apos;, &apos;gemma-7b-it&apos;,
-        &apos;llama3-70b-8192&apos; ]
+        &apos;gemma2-9b-it&apos;, &apos;llama3-70b-8192&apos; ]
       </h3>
       <p className="flex items-center gap-x-3">
         Source Code:{' '}

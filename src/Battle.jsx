@@ -15,10 +15,14 @@ const Battle = () => {
   const [count, setCount] = useState(0);
   const [finalCount, setFinalCount] = useState(0);
   const [fighter, setFighter] = useState(() => model[fighterIndex]); // Use the index to set fighter
-  const [modelList, setModelList] = useState([
-    ...model.slice(0, fighterIndex), // Elements before the fighter
-    ...model.slice(fighterIndex + 1), // Ensuring duplicates of fighter remain if present // for testing only
-  ]);
+
+  const [modelList, setModelList] = useState(() => {
+    return [
+      ...model.slice(0, fighterIndex), // Elements before the fighter
+      ...model.slice(fighterIndex + 1), // Ensuring duplicates of fighter remain if present // for testing only
+    ];
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [modelAData, setModelAData] = useState(null);
   const [modelBData, setModelBData] = useState(null);
@@ -26,16 +30,33 @@ const Battle = () => {
   const queryClient = useQueryClient();
 
   const fetchModelData = useCallback(async () => {
-    setIsLoading(true);
-    const fetchedModelAData = await groqChat(fighter, prompt[finalCount]);
-    const fetchedModelBData = await groqChat(
-      modelList[count % modelList.length],
-      prompt[finalCount]
-    );
-    // Update the state with the fetched data
-    setModelAData(fetchedModelAData);
-    setModelBData(fetchedModelBData);
-    setIsLoading(false);
+    const retryFetch = async (retries) => {
+      try {
+        setIsLoading(true);
+        const fetchedModelAData = await groqChat(fighter, prompt[finalCount]);
+        const fetchedModelBData = await groqChat(
+          modelList[count % modelList.length],
+          prompt[finalCount]
+        );
+        // Update the state with the fetched data
+        setModelAData(fetchedModelAData);
+        setModelBData(fetchedModelBData);
+        setIsLoading(false);
+      } catch (error) {
+        if (retries > 0) {
+          console.error(
+            `Fetch failed, retrying in 3 seconds... (${retries} retries left)`
+          );
+          setTimeout(() => retryFetch(retries - 1), 3000);
+        } else {
+          console.error('Fetch failed after multiple retries:', error);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    retryFetch(3); // Try up to 3 times
+
     //eslint-disable-next-line
   }, [fighter, modelList, count, finalCount, queryClient]);
 
@@ -46,9 +67,10 @@ const Battle = () => {
   const battleChange = () => {
     let nextCount = count + 1;
     if ([4, 7, 9].includes(nextCount)) {
-      setFighter(modelList[0]);
+      const nextFighter = modelList[0];
+      setFighter(nextFighter);
       // Updating model list
-      setModelList((prevList) => prevList.filter((m, index) => index !== 0));
+      setModelList((prevList) => prevList.filter((_, index) => index !== 0));
     }
     if (nextCount === 10) {
       setFinalCount((prevFinalCount) => prevFinalCount + 1);
@@ -73,10 +95,25 @@ const Battle = () => {
 
   useEffect(() => {
     // Reset modelList to include all models except the current fighter on reset
+    const fighterIndex = model.indexOf(fighter);
     setModelList([
       ...model.slice(0, fighterIndex),
       ...model.slice(fighterIndex + 1),
     ]); //eslint-disable-next-line
+  }, [finalCount]);
+
+  // Alert user on page unload if battles are in progress
+  useEffect(() => {
+    if (finalCount !== 5) {
+      const handleUnload = (event) => {
+        event.preventDefault();
+        event.returnValue = '';
+      };
+      window.addEventListener('beforeunload', handleUnload);
+      return () => {
+        window.removeEventListener('beforeunload', handleUnload);
+      };
+    }
   }, [finalCount]);
 
   if (finalCount === 5) {
@@ -86,6 +123,8 @@ const Battle = () => {
   if (isLoading) {
     return <BattleLoading />;
   }
+
+  console.log(fighter, modelList[count % modelList.length], count, finalCount);
 
   return (
     <>
