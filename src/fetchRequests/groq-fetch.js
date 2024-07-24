@@ -6,17 +6,34 @@ const groq = new Groq({
   dangerouslyAllowBrowser: true, // CHANGE THIS TO SERVER SIDE
 });
 
-const systemChange =
-  'Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.';
+const systemChange = [
+  `
+UNLOAD de dados da tabela TAB01_TABELA01 para obter os campos CATEGORIA1, CATEGORIA2, CATEGORIA3, CATEGORIA4, CATEGORIA5 para o ficheiro de output TBLL.S.TBLLD001.TAB01. 
+No acesso à tabela devem ser considerados os seguintes critérios:
+campo TIPO = 'Contrato'
+campo MONTANTE > 100000
+campo DATA > '2024-01-01'
+`,
 
-// model list: LLaMA3 8b , LLaMA3 70b , Mixtral 8x7b , Gemma 7b
+  `Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.`,
+];
 
 async function getGroqChat(model, prompt) {
+  const systemMatch = (prompt) => {
+    if (systemChange[0] == prompt) {
+      return system[0];
+    }
+    if (systemChange[1] == prompt) {
+      return system[2];
+    }
+    return system[1];
+  };
+
   return groq.chat.completions.create({
     messages: [
       {
         role: 'system',
-        content: systemChange == prompt ? system[1] : system[0],
+        content: systemMatch(prompt),
       },
       {
         role: 'user',

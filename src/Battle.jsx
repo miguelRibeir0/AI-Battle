@@ -124,8 +124,6 @@ const Battle = () => {
     return <BattleLoading />;
   }
 
-  console.log(fighter, modelList[count % modelList.length], count, finalCount);
-
   return (
     <>
       <Prompt

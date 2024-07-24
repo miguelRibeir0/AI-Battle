@@ -9,8 +9,28 @@ const Prompt = ({ prompt, count, finalCount }) => {
     setVisible(!visible);
   };
 
-  const systemChange =
-    'Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.';
+  function formatText(text) {
+    // Split the text into lines
+    const lines = text.split('\n');
+
+    // Process each line
+    const formattedLines = lines.map((line) => {
+      // Check if the line contains a colon or //
+      if (line.includes(':') || line.includes('//')) {
+        // Split the line at the colon or //
+        const [before, after] = line.includes(':')
+          ? line.split(':')
+          : line.split('//');
+        const separator = line.includes(':') ? ':' : '//';
+        return `${before}${separator}<br>&nbsp;&nbsp;&nbsp;&nbsp;${after.trim()}`;
+      }
+      // Return the line as is if it doesn't contain a colon or //
+      return line;
+    });
+
+    // Join the lines back together with <br> tags
+    return formattedLines.join('<br>');
+  }
 
   return (
     <>
@@ -37,11 +57,16 @@ const Prompt = ({ prompt, count, finalCount }) => {
         >
           <div className="max-h-3/4 w-1/2 overflow-y-auto border-2 border-lime-500 bg-gray-900">
             <p className="p-10 pb-0 text-white">
-              <span className="font-bold">Prompt:</span> {prompt}
+              <span className="font-bold">Prompt:</span> <br />
+              <span dangerouslySetInnerHTML={{ __html: formatText(prompt) }} />
             </p>
             <p className="p-10 text-white">
               <span className="font-bold">System:</span>{' '}
-              {prompt == systemChange ? system[1] : system[0]}
+              {finalCount === 0
+                ? system[0]
+                : finalCount === 1
+                  ? system[1]
+                  : system[2]}
             </p>
           </div>
           <span></span>

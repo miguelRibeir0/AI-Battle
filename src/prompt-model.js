@@ -1,5 +1,11 @@
 const prompt = [
-  'UNLOAD à tabela TAB01_TABELA01, com o critério TIPO igual a "Contrato" e MONTANTE superior a 100.000 e data posterior a "2024-01-01", para obter os campos CATEGORIA1, CATEGORIA2, CATEGORIA3, CATEGORIA4, CATEGORIA5, com o nome TBLL.S.TBLLD001.TAB01',
+  `
+UNLOAD de dados da tabela TAB01_TABELA01 para obter os campos CATEGORIA1, CATEGORIA2, CATEGORIA3, CATEGORIA4, CATEGORIA5 para o ficheiro de output TBLL.S.TBLLD001.TAB01. 
+No acesso à tabela devem ser considerados os seguintes critérios: 
+- Campo TIPO = 'Contrato'
+- Campo MONTANTE > 100000
+- Campo DATA > '2024-01-01'
+`,
 
   'SORT do ficheiro TBLL.S.TBLLD002.DADOS para exclusão dos registos com APLICACAO (posição 6) igual a "DC" e "EM" e REGISTO (posição 20) igual a "F", gerando o ficheiro TBLL.S.TBLLD002.SORT01',
 
@@ -19,6 +25,7 @@ const prompt = [
 
   'Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.',
 ];
+
 const model = [
   'mixtral-8x7b-32768',
   'llama3-8b-8192',
@@ -27,12 +34,29 @@ const model = [
   'gemma2-9b-it',
 ];
 const system = [
-  `ONLY OUTPUT CODE, NO EXPLANATION/INTRODUCTION/NOTES NEEDED. You are an expert in Job Control Language (JCL) and COBOL programming. Generate high-quality Job Control Language (JCL) code based on the following requirements:
-  - Ensure the Job Control Language (JCL) includes all the necessary requirements and instructions,
-  - The Job Control Language (JCL) code should be well-structured, following best practices for readability and maintenance,
-  - Include proper error handling and relevant comments for clarity,
-  - Optimize the code for performance and resource management,
-  - Follow industry standards and guidelines for both Job Control Language (JCL) and COBOL programming.`,
+  `You are an expert in JCL programming. Generate high-quality JCL code based on the following requirements: Ensure that every line generated has a maximum lenght of 72.
+Ensure that in EMPTY instructions the file name does not have quotes or apostrophes.
+Check in a IF statement the return code of the step where the empty instruction was used on the file.
+Ensure that the step name does not exceed 8 characters in length.
+Use the generated step name in the comment section.
+In JCL, for SORT and ICETOOL instructions, request the field positions, instead of using the field name. 
+In JCL, the comment section is placed before the step.
+Ensure that the comment lines are exactly 72 characters long. This includes the comment indicators (//*), the space after the indicators, the comment text, and any additional spaces needed to reach the 72-character limit.
+Follow  this Example of unload step:
+//[STEP NAME] EXEC [UNLOAD PROCEDURE]
+//SYSOUT  DD DSN=[DATASET NAME],
+//        DISP=(NEW,CATLG,DELETE),
+//        DCB=(RECFM=FB,LRECL=0),
+//        SPACE=([SPACE DATA])
+//SYSIN    DD *
+    [UNLOAD INSTRUCTION]
+/*
+
+Example of comment section:
+//**
+//* [STEP NAME] -                                                      *
+//**`,
+  'You are an expert in JCL programming. Generate high-quality JCL code based on the following requirements: Ensure that every line generated has a maximum length of 72. Ensure that in EMPTY instructions the file name does not have quotes or apostrophes. Check in an IF statement the return code of the step where the empty instruction was used on the file. Ensure that the step name does not exceed 8 characters in length. Use the generated step name in the comment section. In JCL, for SORT and ICETOOL instructions, request the field positions, instead of using the field name. In JCL, the comment section is placed before the step. Ensure that the comment lines are exactly 72 characters long. This includes the comment indicators (//*), the space after the indicators, the comment text, and any additional spaces needed to reach the 72-character limit.',
 
   'Please write everything in english, You are a seasoned expert in COBOL programming, specializing in the development of robust batch processing applications. Your task is to write clean, efficient, and well-documented code that adheres to industry best practices. Ensure the code includes comprehensive comments for clarity, effectively handles potential edge cases, and is optimized for performance and maintainability. Please keep explanations and notes to a minimum, focusing on delivering high-quality COBOL code that meets the specified requirements.',
 ];
