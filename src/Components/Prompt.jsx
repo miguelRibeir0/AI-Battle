@@ -5,6 +5,16 @@ import { system } from '../prompt-model';
 const Prompt = ({ prompt, count, finalCount }) => {
   let [visible, setVisible] = useState(false);
 
+  const systemMatch = () => {
+    if (finalCount == 0) {
+      return system[0];
+    }
+    if (finalCount == 4) {
+      return system[2];
+    }
+    return system[1];
+  };
+
   const toggleVisibility = () => {
     setVisible(!visible);
   };
@@ -13,23 +23,40 @@ const Prompt = ({ prompt, count, finalCount }) => {
     // Split the text into lines
     const lines = text.split('\n');
 
-    // Process each line
-    const formattedLines = lines.map((line) => {
-      // Check if the line contains a colon or //
-      if (line.includes(':') || line.includes('//')) {
-        // Split the line at the colon or //
-        const [before, after] = line.includes(':')
-          ? line.split(':')
-          : line.split('//');
-        const separator = line.includes(':') ? ':' : '//';
-        return `${before}${separator}<br>&nbsp;&nbsp;&nbsp;&nbsp;${after.trim()}`;
-      }
-      // Return the line as is if it doesn't contain a colon or //
-      return line;
-    });
+    // Function to pad a string to a specific length
+    function padToLength(str, length) {
+      return str.length < length ? str + ' '.repeat(length - str.length) : str;
+    }
 
+    // Process each line
+    const formattedLines = lines
+      .map((line, index) => {
+        // Check if the line contains a colon or //
+        if (line.includes(':') || line.includes('//')) {
+          // Split the line at the colon or //
+          const [before, after] = line.includes(':')
+            ? line.split(':', 2)
+            : line.split('//', 2);
+          const separator = line.includes(':') ? ':' : '//';
+          // Format the line and ensure proper indentation and alignment
+          return `${before.trim()}${separator} ${after.trim()}`;
+        }
+        // Remove extra line breaks before comment sections
+        if (
+          line.trim() === '//' &&
+          lines[index + 1] &&
+          lines[index + 1].trim() === ''
+        ) {
+          return '';
+        }
+        // Return the line as is if it doesn't contain a colon or //
+        return line;
+      })
+      .filter((line) => line !== ''); // Remove empty lines
+    // Ensure each line is exactly 72 characters long
+    const paddedLines = formattedLines.map((line) => padToLength(line, 72));
     // Join the lines back together with <br> tags
-    return formattedLines.join('<br>');
+    return paddedLines.join('<br>');
   }
 
   return (
@@ -55,18 +82,19 @@ const Prompt = ({ prompt, count, finalCount }) => {
           className="fixed inset-0 z-10 flex h-screen w-screen items-center justify-center bg-black bg-opacity-70"
           onClick={toggleVisibility}
         >
-          <div className="max-h-3/4 w-1/2 overflow-y-auto border-2 border-lime-500 bg-gray-900">
+          <div className="max-h-[75vh] w-1/2 overflow-y-auto border-2 border-lime-500 bg-gray-900 scrollbar scrollbar-track-transparent scrollbar-thumb-lime-500">
             <p className="p-10 pb-0 text-white">
               <span className="font-bold">Prompt:</span> <br />
               <span dangerouslySetInnerHTML={{ __html: formatText(prompt) }} />
             </p>
             <p className="p-10 text-white">
-              <span className="font-bold">System:</span>{' '}
-              {finalCount === 0
-                ? system[0]
-                : finalCount === 1
-                  ? system[1]
-                  : system[2]}
+              <span className="font-bold">System:</span>
+              <br />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: formatText(systemMatch(prompt)),
+                }}
+              />
             </p>
           </div>
           <span></span>
