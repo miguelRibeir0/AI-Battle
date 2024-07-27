@@ -30,13 +30,6 @@ No acesso à tabela devem ser considerados os seguintes critérios:
   '<br>Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.',
 ];
 
-const model = [
-  'mixtral-8x7b-32768',
-  'llama3-8b-8192',
-  'gemma-7b-it',
-  'llama3-70b-8192',
-  'gemma2-9b-it',
-];
 const system = [
   `<br>You are an expert in JCL programming. Generate high-quality JCL code based on the following requirements: 
   
@@ -78,6 +71,15 @@ Example of comment section:
 `,
 
   '<br>You are a seasoned expert in COBOL programming, specializing in the development of robust batch processing applications. Your task is to write clean, efficient, and well-documented code that adheres to industry best practices. Ensure the code includes comprehensive comments for clarity, effectively handles potential edge cases, and is optimized for performance and maintainability. Please keep explanations and notes to a minimum, focusing on delivering high-quality COBOL code that meets the specified requirements.',
+];
+
+// Model Change is done here
+const model = [
+  'mixtral-8x7b-32768',
+  'llama3-8b-8192',
+  'gemma-7b-it',
+  'llama3-70b-8192',
+  'gemma2-9b-it',
 ];
 
 export { prompt, model, system };
