@@ -1,6 +1,6 @@
 const prompt = [
   `
-  <br>
+  
 UNLOAD de dados da tabela TAB01_TABELA01 para obter os campos CATEGORIA1, CATEGORIA2, CATEGORIA3, CATEGORIA4, CATEGORIA5 para o ficheiro de output TBLL.S.TBLLD001.TAB01. 
 No acesso à tabela devem ser considerados os seguintes critérios: 
 - Campo TIPO = 'Contrato'

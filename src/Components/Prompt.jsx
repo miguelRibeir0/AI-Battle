@@ -84,8 +84,12 @@ const Prompt = ({ prompt, count, finalCount }) => {
         >
           <div className="max-h-[75vh] w-1/2 overflow-y-auto border-2 border-lime-500 bg-gray-900 scrollbar scrollbar-track-transparent scrollbar-thumb-lime-500">
             <p className="p-10 pb-0 text-white">
-              <span className="font-bold">Prompt:</span> <br />
-              <span dangerouslySetInnerHTML={{ __html: formatText(prompt) }} />
+              <span className="font-bold">Prompt:</span>
+              <br />
+              <span
+                dangerouslySetInnerHTML={{ __html: formatText(prompt) }}
+                className="leading-7"
+              />
             </p>
             <p className="p-10 text-white">
               <span className="font-bold">System:</span>
@@ -94,6 +98,7 @@ const Prompt = ({ prompt, count, finalCount }) => {
                 dangerouslySetInnerHTML={{
                   __html: formatText(systemMatch(prompt)),
                 }}
+                className="leading-7"
               />
             </p>
           </div>
