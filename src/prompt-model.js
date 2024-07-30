@@ -38,7 +38,7 @@ const system = [
 - Check in a IF statement the return code of the step where the empty instruction was used on the file.
 - Ensure that the step name does not exceed 8 characters in length.
 - Use the generated step name in the comment section.
-- In JCL, for SORT and ICETOOL instructions, request the field positions, instead of using the field name. 
+- In JCL, only and only when there is SORT and ICETOOL instructions, request the field positions, instead of using the field name. 
 - In JCL, the comment section is placed before the step.
 - Ensure that the comment lines are exactly 72 characters long. This includes the comment indicators (//*), the space after the indicators, the comment text, and any additional spaces needed to reach the 72-character limit.
 <br>
