@@ -8,12 +8,14 @@ No acesso à tabela devem ser considerados os seguintes critérios:
 - Campo DATA > '2024-01-01'
 `,
 
-  '<br> SORT do ficheiro TBLL.S.TBLLD002.DADOS para exclusão dos registos com APLICACAO (posição 6) igual a "DC" e "EM" e REGISTO (posição 20) igual a "F", gerando o ficheiro TBLL.S.TBLLD002.SORT01',
+  '<br> SORT do ficheiro TBLL.S.TBLLD002.DADOS para exclusão dos registos com APLICACAO (posição 6) igual a "DC" e "EM" e REGISTO (posição 20) igual a "F", gerando o ficheiro TBLL.S.TBLLD002.SORT01 and request the field positions, instead of using the field name.' ,
+  
 
   '<br>ICETOOL para obtenção de dois ficheiros de output, utilizando como input o ficheiro TBLL.S.TBLLD003.INPUT, obedecendo às seguintes condições:' +
     '<br>' +
     '<br>- TBLL.S.TBLLD003.FICH01 - Ficheiro resultante do somatório do campo MONTANTE, na posição 22 durante 15, por PARCEIRO, posição 1 durante 14, e CLIENTE, na posição 15 durante 7.<br>' +
-    '<br>- TBLL.S.TBLLD003.FICH02 - Ficheiro resultante do somatório do campo MONTANTE, na posição 22 durante 15, por PARCEIRO, posição 1 durante 14, e CONTRATO, na posição 50 durante 8.<br>',
+    '<br>- TBLL.S.TBLLD003.FICH02 - Ficheiro resultante do somatório do campo MONTANTE, na posição 22 durante 15, por PARCEIRO, posição 1 durante 14, e CONTRATO, na posição 50 durante 8.<br>' +
+    '<br> - Request the field positions, instead of using the field name',
 
   `<br>Se ficheiro TBLL.S.TBLLD004.INPUT tiver conteúdo, executa o programa TBR00010. Este programa terá como input os seguintes ficheiros:
   
@@ -37,8 +39,7 @@ const system = [
 - Ensure that in EMPTY instructions the file name does not have quotes or apostrophes.
 - Check in a IF statement the return code of the step where the empty instruction was used on the file.
 - Ensure that the step name does not exceed 8 characters in length.
-- Use the generated step name in the comment section.
-- In JCL, only and only when there is SORT and ICETOOL instructions, request the field positions, instead of using the field name. 
+- Use the generated step name in the comment section. 
 - In JCL, the comment section is placed before the step.
 - Ensure that the comment lines are exactly 72 characters long. This includes the comment indicators (//*), the space after the indicators, the comment text, and any additional spaces needed to reach the 72-character limit.
 <br>
