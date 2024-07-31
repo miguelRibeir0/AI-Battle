@@ -8,7 +8,7 @@ const PopUp = ({ onClose }) => {
           <strong>Leia com atenção as seguintes instruções:</strong> <br />
           <br />- ⚠️ Muito importante: Se o site for fechado ou se ficar mais de
           5 minutos fora do site, este será atualizado e perderá o progresso.{' '}
-          <br />- Apenas acesse a prompt após as respostas carregarem. A prompt se encontra na caixa &quot;full prompt here&quot;,
+          <br />- Apenas acesse a prompt após as respostas carregarem. A prompt encontra-se na caixa &quot;full prompt here&quot;,
           onde também se encontram os requisitos de JCL. <br />
           <br />
           <strong> - Vote no resultado: </strong>
