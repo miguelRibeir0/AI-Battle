@@ -2,7 +2,7 @@
 const PopUp = ({ onClose }) => {
   return (
     <section className="absolute z-10 h-screen w-screen bg-black bg-opacity-80 text-white">
-      <div className="absolute left-1/2 top-1/2 z-20 flex h-[92vh] -translate-x-1/2 -translate-y-1/2 transform flex-col items-center justify-center gap-y-10 border-2 border-lime-500 bg-gray-900 pb-5 pt-5">
+      <div className="absolute left-1/2 top-1/2 z-20 flex h-[92vh] w-3/5 -translate-x-1/2 -translate-y-1/2 transform flex-col items-center justify-center gap-y-10 border-2 border-lime-500 bg-gray-900 pb-10 pt-10">
         <h1 className="text-2xl">AI BATTLE ⚔️</h1>
         <p className="w-2/3 overflow-y-auto pr-7 leading-7 scrollbar scrollbar-track-transparent scrollbar-thumb-lime-500">
           <strong>Leia com atenção as seguintes instruções:</strong> <br />
