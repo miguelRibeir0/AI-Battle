@@ -4,7 +4,7 @@ const PopUp = ({ onClose }) => {
     <section className="absolute z-10 h-screen w-screen bg-black bg-opacity-80 text-white">
       <div className="absolute left-1/2 top-1/2 z-20 flex h-[92vh] -translate-x-1/2 -translate-y-1/2 transform flex-col items-center justify-center gap-y-10 border-2 border-lime-500 bg-gray-900 pb-5 pt-5">
         <h1 className="text-2xl">AI BATTLE ⚔️</h1>
-        <p className="w-2/3 overflow-y-auto leading-7 scrollbar scrollbar-track-transparent scrollbar-thumb-lime-500">
+        <p className="w-2/3 overflow-y-auto pr-7 leading-7 scrollbar scrollbar-track-transparent scrollbar-thumb-lime-500">
           <strong>Leia com atenção as seguintes instruções:</strong> <br />
           <br />- ⚠️ Muito importante: Se o site for fechado ou se ficar mais de
           5 minutos fora do site, este será atualizado e perderá o progresso.{' '}
