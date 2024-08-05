@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { groqChat } from './fetchRequests/groq-fetch.js';
 import { startBattle } from './fetchRequests/db-fetch.js';
 import { prompt, model } from './prompt-model.js';
@@ -26,8 +25,6 @@ const Battle = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [modelAData, setModelAData] = useState(null);
   const [modelBData, setModelBData] = useState(null);
-
-  const queryClient = useQueryClient();
 
   const fetchModelData = useCallback(async () => {
     const retryFetch = async (retries) => {
@@ -58,7 +55,7 @@ const Battle = () => {
     retryFetch(3); // Try up to 3 times
 
     //eslint-disable-next-line
-  }, [fighter, modelList, count, finalCount, queryClient]);
+  }, [fighter, modelList, count, finalCount]);
 
   useEffect(() => {
     fetchModelData();
