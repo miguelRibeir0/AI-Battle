@@ -8,8 +8,7 @@ No acesso à tabela devem ser considerados os seguintes critérios:
 - Campo DATA > '2024-01-01'
 `,
 
-  '<br> SORT do ficheiro TBLL.S.TBLLD002.DADOS para exclusão dos registos com APLICACAO (posição 6) igual a "DC" e "EM" e REGISTO (posição 20) igual a "F", gerando o ficheiro TBLL.S.TBLLD002.SORT01 and request the field positions, instead of using the field name.' ,
-  
+  '<br> SORT do ficheiro TBLL.S.TBLLD002.DADOS para exclusão dos registos com APLICACAO (posição 6) igual a "DC" e "EM" e REGISTO (posição 20) igual a "F", gerando o ficheiro TBLL.S.TBLLD002.SORT01 and request the field positions, instead of using the field name.',
 
   '<br>ICETOOL para obtenção de dois ficheiros de output, utilizando como input o ficheiro TBLL.S.TBLLD003.INPUT, obedecendo às seguintes condições:' +
     '<br>' +
@@ -76,9 +75,9 @@ Example of comment section:
 // Model Change is done here
 const model = [
   'mixtral-8x7b-32768',
-  'llama-3.1-8b-instant',
+  'llama-3-8b-8182',
   'llama3-70b-8192',
-  'llama-3.1-70b-versatile',
+  'gemma2-7b-it',
   'gemma2-9b-it',
 ];
 
