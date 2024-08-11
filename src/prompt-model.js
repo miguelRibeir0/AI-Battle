@@ -28,7 +28,7 @@ No acesso à tabela devem ser considerados os seguintes critérios:
   - ERRO - TBLL.S.TBLLD004.ERRO
 `,
 
-  '<br>Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.',
+  '<br>Criar programa COBOL que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.',
 ];
 
 const system = [
