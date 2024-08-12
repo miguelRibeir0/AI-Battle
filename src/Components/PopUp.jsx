@@ -23,11 +23,24 @@ const PopUp = ({ onClose }) => {
             Considere os seguintes critérios ao avaliar a funcionalidade do
             código:{' '}
           </strong>{' '}
-          <br /> <br /> -Representação: O código representa o que é esperado com
-          base nos requisitos? <br /> -Clareza: O código é claro e fácil de
-          entender? <br /> <br /> Avalie as partes funcionais do código,
-          ignorando quaisquer partes irrelevantes <br />
-          Avalie do ponto de vista de um especialista sénior em COBOL e JCL.
+          <br /> <br />
+          - Representação: O código representa o que é esperado com base nos
+          requisitos? <br />- Clareza: O código é claro e fácil de entender?{' '}
+          <br /> <br /> <strong>Pontos adicionais a ter em conta:</strong>{' '}
+          <br />
+          <br />- Foco na funcionalidade: Avalie as partes funcionais do código,
+          ignorando quaisquer partes irrelevantes ou que não se alinhem
+          diretamente com os requisitos. Não se pretende, nesta fase, que o
+          código gerado esteja perfeito, por isso não deve ser analisado em
+          detalhe. <br />
+          <br />- Ruído visual: Esteja ciente de que o código gerado pode
+          incluir muitos comentários ou trechos que podem parecer desnecessários
+          ou criar &quot;ruído visual&quot;. Apesar disso, é importante procurar
+          por pedaços de código úteis que possam ser aproveitados. <br />
+          <br />- Especialização: Avalie do ponto de vista de um especialista
+          sénior em COBOL e JCL, mas mantendo o foco no que realmente importa
+          para a funcionalidade e clareza do código, sem se perder em detalhes
+          excessivos.
         </p>
         <button
           onClick={async () => {
