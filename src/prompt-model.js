@@ -28,7 +28,7 @@ No acesso à tabela devem ser considerados os seguintes critérios:
   - ERRO - TBLL.S.TBLLD004.ERRO
 `,
 
-  '<br>Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.',
+  '<br>Criar programa COBOL que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.',
 ];
 
 const system = [
@@ -75,7 +75,7 @@ Example of comment section:
 // Model Change is done here
 const model = [
   'mixtral-8x7b-32768',
-  'llama-3-8b-8182',
+  'llama3-8b-8182',
   'llama3-70b-8192',
   'gemma2-7b-it',
   'gemma2-9b-it',
