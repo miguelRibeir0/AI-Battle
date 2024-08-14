@@ -15,7 +15,7 @@ campo MONTANTE > 100000
 campo DATA > '2024-01-01'
 `,
 
-  `Criar programa que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.`,
+  `Criar programa COBOL que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.`,
 ];
 
 function getGroqChat(model, prompt) {
