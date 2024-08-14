@@ -75,7 +75,7 @@ Example of comment section:
 // Model Change is done here
 const model = [
   'mixtral-8x7b-32768',
-  'llama3-8b-8182',
+  'llama3-8b-8192',
   'llama3-70b-8192',
   'gemma-7b-it',
   'gemma2-9b-it',
