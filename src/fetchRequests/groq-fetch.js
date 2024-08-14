@@ -8,14 +8,14 @@ const groq = new Groq({
 
 const systemChange = [
   `
-UNLOAD de dados da tabela TAB01_TABELA01 para obter os campos CATEGORIA1, CATEGORIA2, CATEGORIA3, CATEGORIA4, CATEGORIA5 para o ficheiro de output TBLL.S.TBLLD001.TAB01. 
-No acesso à tabela devem ser considerados os seguintes critérios:
-campo TIPO = 'Contrato'
-campo MONTANTE > 100000
-campo DATA > '2024-01-01'
+<br>UNLOAD de dados da tabela TAB01_TABELA01 para obter os campos CATEGORIA1, CATEGORIA2, CATEGORIA3, CATEGORIA4, CATEGORIA5 para o ficheiro de output TBLL.S.TBLLD001.TAB01. 
+No acesso à tabela devem ser considerados os seguintes critérios: 
+- Campo TIPO = 'Contrato'
+- Campo MONTANTE > 100000
+- Campo DATA > '2024-01-01'
 `,
 
-  `Criar programa COBOL que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.`,
+  `<br>Criar programa COBOL que efetue cálculo de operações matemáticas simples (adição, subtração, multiplicação, divisão) de dois valores, em que o operador e os valores são recebidos por SYSIN, apresentando o resultado da operação via display.`,
 ];
 
 function getGroqChat(model, prompt) {
