@@ -11,9 +11,8 @@ No acesso à tabela devem ser considerados os seguintes critérios:
 
   '<br>ICETOOL para obtenção de dois ficheiros de output, utilizando como input o ficheiro TBLL.S.TBLLD003.INPUT, obedecendo às seguintes condições:' +
     '<br>' +
-    '<br>- TBLL.S.TBLLD003.FICH01 - Ficheiro resultante do somatório do campo MONTANTE, na posição 22 durante 15, por PARCEIRO, posição 1 durante 14, e CLIENTE, na posição 15 durante 7.<br>' +
-    '<br>- TBLL.S.TBLLD003.FICH02 - Ficheiro resultante do somatório do campo MONTANTE, na posição 22 durante 15, por PARCEIRO, posição 1 durante 14, e CONTRATO, na posição 50 durante 8.<br>' +
-    '<br> - Request the field positions, instead of using the field name',
+    '<br>- TBLL.S.TBLLD003.FICH01 - Ficheiro resultante do somatório do campo numérico MONTANTE (15 bytes de tamanho, começando na posição 22), por PARCEIRO (14 bytes de tamanho, começando no byte 1), e por CLIENTE (7 bytes de tamanho, começando no byte 15).<br>' +
+    '<br>- TBLL.S.TBLLD003.FICH02 - Ficheiro resultante do somatório do campo numérico MONTANTE (15 bytes de tamanho, começando na posição 22), por PARCEIRO (14 bytes de tamanho, começando no byte 1), e CONTRATO (8 bytes de tamanho, começando no byte 50).<br>',
 
   `<br>Se ficheiro TBLL.S.TBLLD004.INPUT tiver conteúdo, executa o programa TBR00010. Este programa terá como input os seguintes ficheiros:
   
