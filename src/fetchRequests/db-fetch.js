@@ -5,6 +5,7 @@ const startBattle = async (
   modelB,
   winner,
   prompt,
+  systemPrompt,
   a_answer,
   b_answer
 ) => {
@@ -18,6 +19,7 @@ const startBattle = async (
       modelB,
       winner,
       prompt,
+      systemPrompt,
       a_answer,
       b_answer,
     }),

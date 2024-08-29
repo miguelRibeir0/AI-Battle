@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { groqChat } from './fetchRequests/groq-fetch.js';
 import { startBattle } from './fetchRequests/db-fetch.js';
-import { prompt, model } from './prompt-model.js';
+import { prompt, model, system } from './prompt-model.js';
 import Prompt from './Components/Prompt.jsx';
 import BattleBox from './Components/BattleBox/BattleBox.jsx';
 import BattleLoading from './Components/BattleBox/BattleBox(loading).jsx';
@@ -78,6 +78,16 @@ const Battle = () => {
     }
   };
 
+  const systemMatch = () => {
+    if (finalCount == 0) {
+      return system[0];
+    }
+    if (finalCount == 4) {
+      return system[2];
+    }
+    return system[1];
+  };
+
   const buttonAction = (winner) => {
     battleChange();
     startBattle(
@@ -85,6 +95,7 @@ const Battle = () => {
       modelList[count % modelList.length],
       winner,
       prompt[finalCount],
+      systemMatch(),
       modelAData,
       modelBData
     );
