@@ -18,7 +18,7 @@ const Battle = () => {
   const [modelList, setModelList] = useState(() => {
     return [
       ...model.slice(0, fighterIndex), // Elements before the fighter
-      ...model.slice(fighterIndex + 1), // Ensuring duplicates of fighter remain if present // for testing only
+      ...model.slice(fighterIndex + 1), // Elements after the fighter
     ];
   });
 
